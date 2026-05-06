@@ -7,11 +7,12 @@ Além disso, o aplicativo busca incentivar a autonomia e disciplina das criança
 O projeto foi desenvolvido utilizando Flutter para o front-end, proporcionando uma experiência multiplataforma, com foco em responsividade e usabilidade.
 
 
-## Desenvolvimento do Projeto
+## 👥 Contrato de Desenvolvimento
 
 | Nome do Aluno              | Telas e Funcionalidades sob sua responsabilidade |
-|--------------------------|-----------------------------------------------|
-| Robert Costa Alcântara   | Tela inicial, cadastro de criança, listagem de tarefas |
-| Nome do Integrante 2     | Tela de perfil da criança, edição de dados     |
-| Nome do Integrante 3     | Tela de atividades diárias, controle de status |
-| Nome do Integrante 4     | Navegação entre telas, design e UI/UX          |
+|--------------------------|--------------------------------------------------------- |
+| Integrante 1             | Tela Home, listagem de tarefas, lógica de rotina diária  |
+| Integrante 2             | Tela de Login, autenticação e validação de usuário       |
+| Integrante 3             | Perfil da criança (visualizar, editar, excluir dados)    |
+| Integrante 4             | Cadastro de atividades, horários, categorias e repetição |
+| Robert Costa Alcântara   | Histórico, configurações e compartilhamento              |
