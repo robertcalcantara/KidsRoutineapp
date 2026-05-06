@@ -11,7 +11,7 @@ O projeto foi desenvolvido utilizando Flutter para o front-end, proporcionando u
 
 | Nome do Aluno              | Telas e Funcionalidades sob sua responsabilidade |
 |--------------------------|--------------------------------------------------------- |
-| Integrante 1             | Tela Home, listagem de tarefas, lógica de rotina diária  |
+| Eliseu F. Martins        | Tela Home, listagem de tarefas, lógica de rotina diária  |
 | Rafael Dantas            | Tela de Login, autenticação e validação de usuário       |
 | Integrante 3             | Perfil da criança (visualizar, editar, excluir dados)    |
 | Integrante 4             | Cadastro de atividades, horários, categorias e repetição |
