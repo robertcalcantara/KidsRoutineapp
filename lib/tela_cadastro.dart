@@ -14,132 +14,196 @@ class TelaCadastro extends StatelessWidget {
 
         child: SingleChildScrollView(
 
-          child: Padding(
+          padding: const EdgeInsets.all(24),
 
-            padding: const EdgeInsets.all(24),
+          child: Column(
 
-            child: Column(
+            crossAxisAlignment:
+                CrossAxisAlignment.center,
 
-              children: [
+            children: [
 
-                // BOTÃO VOLTAR
-                Align(
+              // BOTÃO VOLTAR
+              Align(
 
-                  alignment: Alignment.topLeft,
+                alignment: Alignment.topLeft,
 
-                  child: IconButton(
+                child: IconButton(
 
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
 
-                    icon: const Icon(Icons.arrow_back),
+                  icon: const Icon(Icons.arrow_back),
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              // LOGO
+              Align(
+
+                alignment: Alignment.topRight,
+
+                child: Container(
+
+                  width: 65,
+                  height: 65,
+
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                  ),
+
+                  child: ClipOval(
+
+                    child: Image.asset(
+                      'assets/images/logo.png',
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
+              ),
 
-                const SizedBox(height: 10),
+              const SizedBox(height: 10),
 
-                // TÍTULO
-                const Text(
+              // TÍTULO
+              const Text(
 
-                  'Criar Conta',
+                'Criar Conta',
+
+                style: TextStyle(
+                  fontSize: 34,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(height: 40),
+
+              // EMAIL
+              campoTexto(
+                texto: 'Email',
+              ),
+
+              const SizedBox(height: 20),
+
+              // SENHA
+              campoTexto(
+                texto: 'Senha',
+                senha: true,
+              ),
+
+              const SizedBox(height: 8),
+
+              // TEXTO EXPLICATIVO
+              const Align(
+
+                alignment: Alignment.centerLeft,
+
+                child: Text(
+
+                  'A senha deve conter:\n'
+                  '• 2 letras\n'
+                  '• até 4 números',
 
                   style: TextStyle(
-                    fontSize: 34,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                    color: Colors.black54,
                   ),
                 ),
+              ),
 
-                const SizedBox(height: 40),
+              const SizedBox(height: 20),
 
-                // EMAIL
-                campoTexto('EMAIL'),
+              // CONFIRMAR SENHA
+              campoTexto(
+                texto: 'Confirmar senha',
+                senha: true,
+              ),
 
-                espacamento(),
+              const SizedBox(height: 20),
 
-                // SENHA
-                campoTexto(
-                  'SENHA',
-                  senha: true,
-                ),
+              // RESPONSÁVEL 1
+              campoTexto(
+                texto: 'Nome do responsável',
+              ),
 
-                espacamento(),
+              const SizedBox(height: 20),
 
-                // CONFIRMAR SENHA
-                campoTexto(
-                  'CONFIRMAR SENHA',
-                  senha: true,
-                ),
+              // RESPONSÁVEL 2
+              campoTexto(
+                texto: 'Segundo responsável (Opcional)',
+              ),
 
-                espacamento(),
+              const SizedBox(height: 20),
 
-                // RESPONSÁVEL 1
-                campoTexto('RESPONSÁVEL 1'),
+              // CRIANÇA
+              campoTexto(
+                texto: 'Nome da criança',
+              ),
 
-                espacamento(),
+              const SizedBox(height: 40),
 
-                // RESPONSÁVEL 2
-                campoTexto(
-                  'RESPONSÁVEL 2 (Opcional)',
-                ),
+              // BOTÃO
+              SizedBox(
 
-                espacamento(),
+                width: double.infinity,
+                height: 60,
 
-                // CRIANÇA
-                campoTexto('NOME DA CRIANÇA'),
+                child: ElevatedButton(
 
-                const SizedBox(height: 40),
+                  onPressed: () {
 
-                // BOTÃO
-                SizedBox(
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(
 
-                  width: double.infinity,
-                  height: 60,
+                      const SnackBar(
 
-                  child: ElevatedButton(
-
-                    onPressed: () {},
-
-                    style:
-                        ElevatedButton.styleFrom(
-
-                      backgroundColor:
-                          const Color(0xFF4E8FE8),
-
-                      shape: RoundedRectangleBorder(
-
-                        borderRadius:
-                            BorderRadius.circular(16),
+                        content: Text(
+                          'Conta criada com sucesso!',
+                        ),
                       ),
+                    );
+                  },
+
+                  style:
+                      ElevatedButton.styleFrom(
+
+                    backgroundColor:
+                        const Color(0xFF4E8FE8),
+
+                    shape: RoundedRectangleBorder(
+
+                      borderRadius:
+                          BorderRadius.circular(16),
                     ),
+                  ),
 
-                    child: const Text(
+                  child: const Text(
 
-                      'CRIAR CONTA',
+                    'CRIAR CONTA',
 
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+
+              const SizedBox(height: 30),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget espacamento() {
+  // CAMPO PERSONALIZADO
+  Widget campoTexto({
 
-    return const SizedBox(height: 20);
-  }
-
-  Widget campoTexto(
-    String texto, {
+    required String texto,
     bool senha = false,
   }) {
 
@@ -158,6 +222,8 @@ class TelaCadastro extends StatelessWidget {
 
           borderRadius:
               BorderRadius.circular(16),
+
+          borderSide: BorderSide.none,
         ),
       ),
     );

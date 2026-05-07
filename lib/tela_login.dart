@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'storage_service.dart';
+import 'tela_home.dart';
+
 class TelaLogin extends StatefulWidget {
+
   const TelaLogin({super.key});
 
   @override
@@ -17,206 +21,222 @@ class _TelaLoginState
   final TextEditingController senhaController =
       TextEditingController();
 
+  bool carregando = false;
+
+  Future<void> fazerLogin() async {
+
+    // LOGIN DEV
+    if (
+
+      emailController.text.trim() ==
+          'dev@kidsroutine.com' &&
+
+      senhaController.text.trim() ==
+          'dev123'
+    ) {
+
+      Navigator.pushReplacement(
+
+        context,
+
+        MaterialPageRoute(
+
+          builder: (context) =>
+              const TelaHome(
+
+            nomeCrianca: 'Kid',
+
+            idCrianca: '#0000',
+          ),
+        ),
+      );
+
+      return;
+    }
+
+    setState(() {
+      carregando = true;
+    });
+
+    String email =
+        emailController.text.trim();
+
+    String senha =
+        senhaController.text.trim();
+
+    // BUSCAR USUÁRIO
+    final usuario =
+        await StorageService.buscarUsuario(
+      email,
+    );
+
+    // EMAIL NÃO EXISTE
+    if (usuario == null) {
+
+      setState(() {
+        carregando = false;
+      });
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+
+        const SnackBar(
+
+          content: Text(
+            'Email não encontrado',
+          ),
+        ),
+      );
+
+      return;
+    }
+
+    // SENHA ERRADA
+    if (usuario['senha'] != senha) {
+
+      setState(() {
+        carregando = false;
+      });
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+
+        const SnackBar(
+
+          content: Text(
+            'Senha incorreta',
+          ),
+        ),
+      );
+
+      return;
+    }
+
+    // LOGIN CORRETO
+    setState(() {
+      carregando = false;
+    });
+
+    Navigator.pushReplacement(
+
+      context,
+
+      MaterialPageRoute(
+
+        builder: (context) => TelaHome(
+
+          nomeCrianca:
+              usuario['crianca'],
+
+          idCrianca:
+              usuario['idCrianca'],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
 
-    final larguraTela =
-        MediaQuery.of(context).size.width;
-
     return Scaffold(
 
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor:
+          const Color(0xFFF5F5F5),
 
       body: SafeArea(
 
         child: SingleChildScrollView(
 
-          child: Padding(
+          padding:
+              const EdgeInsets.all(24),
 
-            padding: const EdgeInsets.all(24),
+          child: Column(
 
-            child: Column(
+            children: [
 
-              children: [
+              const SizedBox(height: 20),
 
-                // LOGO
-                Align(
+              // LOGO
+              Align(
 
-                  alignment: Alignment.topRight,
+                alignment: Alignment.topRight,
 
-                  child: Container(
+                child: Container(
 
-                    width: 60,
-                    height: 60,
+                  width: 65,
+                  height: 65,
 
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white,
-                    ),
+                  decoration:
+                      const BoxDecoration(
 
-                    child: ClipOval(
-
-                      child: Image.asset(
-                        'assets/images/logo.png',
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                const Text(
-
-                  'Login',
-
-                  style: TextStyle(
-                    fontSize: 34,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-
-                const SizedBox(height: 30),
-
-                // IMAGEM
-                Container(
-
-                  width: larguraTela * 0.8,
-
-                  constraints:
-                      const BoxConstraints(
-                    maxWidth: 350,
-                  ),
-
-                  height: 220,
-
-                  decoration: BoxDecoration(
-
-                    borderRadius:
-                        BorderRadius.circular(40),
-
-                    border: Border.all(
-                      color: Colors.blue,
-                      width: 2,
-                    ),
-
+                    shape: BoxShape.circle,
                     color: Colors.white,
                   ),
 
-                  child: ClipRRect(
-
-                    borderRadius:
-                        BorderRadius.circular(40),
+                  child: ClipOval(
 
                     child: Image.asset(
-                      'assets/images/family.png',
-                      fit: BoxFit.contain,
+                      'assets/images/logo.png',
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
+              ),
 
-                const SizedBox(height: 40),
+              const SizedBox(height: 30),
 
-                const Text(
+              // IMAGEM
+              Image.asset(
+                'assets/images/family.png',
+                height: 250,
+              ),
 
-                  'Bem-vindo ao\nRotinaKids',
+              const SizedBox(height: 30),
 
-                  textAlign: TextAlign.center,
+              // TÍTULO
+              const Text(
 
-                  style: TextStyle(
-                    fontSize: 34,
-                    fontWeight: FontWeight.bold,
-                  ),
+                'Login',
+
+                style: TextStyle(
+                  fontSize: 36,
+                  fontWeight: FontWeight.bold,
                 ),
+              ),
 
-                const SizedBox(height: 40),
+              const SizedBox(height: 40),
 
-                // EMAIL
-                TextField(
+              // EMAIL
+              campoTexto(
 
-                  controller: emailController,
+                controller:
+                    emailController,
 
-                  decoration: InputDecoration(
+                texto: 'Email',
+              ),
 
-                    hintText: 'EMAIL',
+              const SizedBox(height: 20),
 
-                    filled: true,
-                    fillColor: Colors.white,
+              // SENHA
+              campoTexto(
 
-                    border: OutlineInputBorder(
+                controller:
+                    senhaController,
 
-                      borderRadius:
-                          BorderRadius.circular(16),
-                    ),
-                  ),
-                ),
+                texto: 'Senha',
 
-                const SizedBox(height: 20),
+                senha: true,
+              ),
 
-                // SENHA
-                TextField(
+              const SizedBox(height: 10),
 
-                  controller: senhaController,
+              // ESQUECI SENHA
+              Align(
 
-                  obscureText: true,
+                alignment:
+                    Alignment.centerRight,
 
-                  decoration: InputDecoration(
-
-                    hintText: 'SENHA',
-
-                    filled: true,
-                    fillColor: Colors.white,
-
-                    border: OutlineInputBorder(
-
-                      borderRadius:
-                          BorderRadius.circular(16),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 30),
-
-                // BOTÃO ENTRAR
-                SizedBox(
-
-                  width: double.infinity,
-                  height: 60,
-
-                  child: ElevatedButton(
-
-                    onPressed: () {},
-
-                    style:
-                        ElevatedButton.styleFrom(
-
-                      backgroundColor:
-                          const Color(0xFF4E8FE8),
-
-                      shape: RoundedRectangleBorder(
-
-                        borderRadius:
-                            BorderRadius.circular(16),
-                      ),
-                    ),
-
-                    child: const Text(
-
-                      'ENTRAR',
-
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                // RECUPERAR SENHA
-                TextButton(
+                child: TextButton(
 
                   onPressed: () {
 
@@ -230,25 +250,119 @@ class _TelaLoginState
                     'Esqueci minha senha',
                   ),
                 ),
+              ),
 
-                // NOVA CONTA
-                TextButton(
+              const SizedBox(height: 20),
 
-                  onPressed: () {
+              // BOTÃO LOGIN
+              SizedBox(
 
-                    Navigator.pushNamed(
-                      context,
-                      '/cadastro',
-                    );
-                  },
+                width: double.infinity,
+                height: 60,
 
-                  child: const Text(
-                    'Criar nova conta',
+                child: ElevatedButton(
+
+                  onPressed:
+                      carregando
+                          ? null
+                          : fazerLogin,
+
+                  style:
+                      ElevatedButton.styleFrom(
+
+                    backgroundColor:
+                        const Color(
+                            0xFF4E8FE8),
+
+                    shape:
+                        RoundedRectangleBorder(
+
+                      borderRadius:
+                          BorderRadius.circular(
+                              16),
+                    ),
+                  ),
+
+                  child:
+                      carregando
+                          ? const CircularProgressIndicator(
+                              color:
+                                  Colors.white,
+                            )
+                          : const Text(
+
+                              'ENTRAR',
+
+                              style: TextStyle(
+                                fontSize: 22,
+                                color:
+                                    Colors.white,
+                                fontWeight:
+                                    FontWeight.bold,
+                              ),
+                            ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // CRIAR CONTA
+              TextButton(
+
+                onPressed: () {
+
+                  Navigator.pushNamed(
+                    context,
+                    '/cadastro',
+                  );
+                },
+
+                child: const Text(
+
+                  'Criar nova conta',
+
+                  style: TextStyle(
+                    fontSize: 16,
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
+        ),
+      ),
+    );
+  }
+
+  // CAMPO PERSONALIZADO
+  Widget campoTexto({
+
+    required TextEditingController controller,
+
+    required String texto,
+
+    bool senha = false,
+  }) {
+
+    return TextField(
+
+      controller: controller,
+
+      obscureText: senha,
+
+      decoration: InputDecoration(
+
+        hintText: texto,
+
+        filled: true,
+
+        fillColor: Colors.white,
+
+        border: OutlineInputBorder(
+
+          borderRadius:
+              BorderRadius.circular(16),
+
+          borderSide: BorderSide.none,
         ),
       ),
     );
