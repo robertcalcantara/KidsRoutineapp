@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'widgets/navbar.dart';
+import 'ficha_medica_screen.dart'; // Ajuste o caminho das pastas se for necessário
 
 class TelaHome extends StatelessWidget {
   final String nomeCrianca;
@@ -16,9 +17,8 @@ class TelaHome extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       bottomNavigationBar: const Navbar(
-  currentIndex: 0,
-),
-
+        currentIndex: 0,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -133,13 +133,14 @@ class TelaHome extends StatelessWidget {
 
                     const SizedBox(height: 20),
 
-                    // FOTO PERFIL
+                    // FOTO PERFIL (Alterado para navegar para a Ficha Médica)
                     GestureDetector(
                       onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                                'Perfil da criança em desenvolvimento'),
+                        // NAVEGAÇÃO ADICIONADA AQUI 👇
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const FichaMedicaScreen(),
                           ),
                         );
                       },

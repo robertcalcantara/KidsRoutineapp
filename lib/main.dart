@@ -5,6 +5,7 @@ import 'tela_recuperar_senha.dart';
 import 'tela_home.dart';
 import 'tela_historico.dart';
 import 'tela_configuracoes.dart';
+import 'ficha_medica_screen.dart';
 
 void main() {
   runApp(

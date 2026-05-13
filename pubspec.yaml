@@ -1,9 +1,6 @@
 name: kids_routine_app
-
 description: "Aplicativo de rotina infantil."
-
 publish_to: 'none'
-
 version: 1.0.0+1
 
 environment:
@@ -14,18 +11,18 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.8
-
   flutter_secure_storage: ^9.2.2
+  
+  # Adicione estas duas linhas com a mesma margem das bibliotecas de cima:
+  pdf: ^3.10.8
+  printing: ^5.11.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
   flutter_lints: ^6.0.0
 
 flutter:
-
   uses-material-design: true
-
   assets:
     - assets/images/
