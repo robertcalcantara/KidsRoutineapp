@@ -10,10 +10,9 @@ O projeto foi desenvolvido utilizando Flutter para o front-end, proporcionando u
 ## 👥 Contrato de Desenvolvimento
 
 | Nome do Aluno              | Telas e Funcionalidades sob sua responsabilidade |
-|--------------------------|----------------------------------------------------------- |
-| Eliseu F. Martins        | Tela Login, tela cadastro, tela rec. de senha, tela home  |
-| Rafael Dantas            | Tela de geraçao e criaçao de relatorio medico/pdf         |
-| Luís Eduardo Cunha M.    | Perfil da criança (visualizar, editar, excluir dados)     |
-| Pedro Roberto N. Melo    | Cadastro de atividades, horários, categorias e repetição  |
-| Robert Costa Alcântara   | Histórico, configurações e compartilhamento               |
-| Yan Levi Silva Cardoso   | Pdf da rotina e compartilhamento                          |
+|--------------------------|--------------------------------------------------------- |
+| Eliseu F. Martins        | Tela Home, listagem de tarefas, lógica de rotina diária  |
+| Rafael Dantas            | Tela de Login, autenticação e validação de usuário       |
+| Luís Eduardo Cunha M.    | Perfil da criança (visualizar, editar, excluir dados)    |
+| Pedro Roberto N. Melo    | Cadastro de atividades, horários, categorias e repetição |
+| Robert Costa Alcântara   | Histórico, configurações e compartilhamento              |
