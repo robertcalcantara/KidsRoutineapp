@@ -229,3 +229,4 @@ class TelaCadastro extends StatelessWidget {
     );
   }
 }
+
