@@ -16,3 +16,4 @@ O projeto foi desenvolvido utilizando Flutter para o front-end, proporcionando u
 | Luís Eduardo Cunha M.    | Perfil da criança (visualizar, editar, excluir dados)    |
 | Pedro Roberto N. Melo    | Cadastro de atividades, horários, categorias e repetição |
 | Robert Costa Alcântara   | Histórico, configurações e compartilhamento              |
+| Yan Levi Silva Cardoso   | Pdf da rotina e compartilhamento                         |
