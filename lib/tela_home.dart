@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'widgets/navbar.dart';
+import 'tela_perfil.dart'; 
 
 class TelaHome extends StatelessWidget {
   final String nomeCrianca;
@@ -16,9 +17,8 @@ class TelaHome extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       bottomNavigationBar: const Navbar(
-  currentIndex: 0,
-),
-
+        currentIndex: 0,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -136,10 +136,10 @@ class TelaHome extends StatelessWidget {
                     // FOTO PERFIL
                     GestureDetector(
                       onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                                'Perfil da criança em desenvolvimento'),
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const TelaPerfil(),
                           ),
                         );
                       },
