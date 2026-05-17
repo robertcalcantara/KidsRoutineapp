@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'dart:typed_data';
 import 'widgets/navbar.dart';
-import 'tela_perfil.dart'; 
+import 'Tela_perfil.dart';
 
-class TelaHome extends StatelessWidget {
+class TelaHome extends StatefulWidget {
   final String nomeCrianca;
   final String idCrianca;
 
@@ -13,20 +14,46 @@ class TelaHome extends StatelessWidget {
   });
 
   @override
+  State<TelaHome> createState() => _TelaHomeState();
+}
+
+class _TelaHomeState extends State<TelaHome> {
+  late String nomeCrianca;
+  late String idCrianca;
+
+  String escola = "Escola UNIT";
+  String emergencia = "Mãe (79) 98888-7777";
+  String observacoes = "ALÉRGICA A Farofa";
+  String idade = "3";
+  String genero = "feminino";
+
+  Uint8List? fotoPerfil;
+
+  @override
+  void initState() {
+    super.initState();
+
+    nomeCrianca = widget.nomeCrianca;
+    idCrianca = widget.idCrianca;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
+
       bottomNavigationBar: const Navbar(
         currentIndex: 0,
       ),
+
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // TOPO
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(24),
+
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
@@ -37,89 +64,101 @@ class TelaHome extends StatelessWidget {
                     end: Alignment.bottomCenter,
                   ),
                 ),
+
                 child: Column(
                   children: [
-                    // LOGO + SAIR
+
+                    // TOPO
                     Align(
                       alignment: Alignment.topRight,
+
                       child: Column(
                         children: [
+
                           // LOGO
-                          GestureDetector(
-                            onTap: () async {
-                              bool? sair = await showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    title: const Text('Sair'),
-                                    content: const Text(
-                                        'Deseja realmente sair da conta?'),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.pop(context, false),
-                                        child: const Text('Não'),
-                                      ),
-                                      ElevatedButton(
-                                        onPressed: () =>
-                                            Navigator.pop(context, true),
-                                        child: const Text('Sim'),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                              if (sair == true) {
-                                Navigator.pushReplacementNamed(context, '/');
-                              }
-                            },
-                            child: Container(
-                              width: 60,
-                              height: 60,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.white,
-                              ),
-                              child: ClipOval(
-                                child: Image.asset(
-                                  'assets/images/logo.png',
-                                  fit: BoxFit.cover,
-                                ),
+                          Container(
+                            width: 58,
+                            height: 58,
+
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius:
+                                  BorderRadius.circular(100),
+                            ),
+
+                            child: ClipRRect(
+                              borderRadius:
+                                  BorderRadius.circular(100),
+
+                              child: Image.asset(
+                                'assets/images/logo.png',
+                                fit: BoxFit.cover,
                               ),
                             ),
                           ),
+
                           const SizedBox(height: 8),
-                          // TEXTO SAIR
+
+                          // BOTÃO SAIR
                           GestureDetector(
                             onTap: () async {
-                              bool? sair = await showDialog(
+
+                              final confirmar =
+                                  await showDialog<bool>(
                                 context: context,
+
                                 builder: (context) {
                                   return AlertDialog(
-                                    title: const Text('Sair'),
+                                    title: const Text(
+                                      'Confirmar saída',
+                                    ),
+
                                     content: const Text(
-                                        'Deseja realmente sair da conta?'),
+                                      'Deseja realmente sair?',
+                                    ),
+
                                     actions: [
                                       TextButton(
-                                        onPressed: () =>
-                                            Navigator.pop(context, false),
-                                        child: const Text('Não'),
+                                        onPressed: () {
+                                          Navigator.pop(
+                                            context,
+                                            false,
+                                          );
+                                        },
+
+                                        child: const Text(
+                                          'Cancelar',
+                                        ),
                                       ),
+
                                       ElevatedButton(
-                                        onPressed: () =>
-                                            Navigator.pop(context, true),
-                                        child: const Text('Sim'),
+                                        onPressed: () {
+                                          Navigator.pop(
+                                            context,
+                                            true,
+                                          );
+                                        },
+
+                                        child: const Text(
+                                          'Sair',
+                                        ),
                                       ),
                                     ],
                                   );
                                 },
                               );
-                              if (sair == true) {
-                                Navigator.pushReplacementNamed(context, '/');
+
+                              if (confirmar == true) {
+                                Navigator.pushReplacementNamed(
+                                  context,
+                                  '/',
+                                );
                               }
                             },
+
                             child: const Text(
                               'Sair',
+
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -135,38 +174,107 @@ class TelaHome extends StatelessWidget {
 
                     // FOTO PERFIL
                     GestureDetector(
-                      onTap: () {
-                        Navigator.push(
+                      onTap: () async {
+                        final resultado =
+                            await Navigator.push(
                           context,
+
                           MaterialPageRoute(
-                            builder: (context) => const TelaPerfil(),
+                            builder: (context) =>
+                                TelaPerfil(
+                              nome: nomeCrianca,
+                              idade: idade,
+                              genero: genero,
+                              escola: escola,
+                              emergencia: emergencia,
+                              observacoes:
+                                  observacoes,
+                              foto: fotoPerfil,
+                            ),
                           ),
                         );
+
+                        if (resultado != null) {
+                          setState(() {
+                            nomeCrianca =
+                                resultado['nome'];
+
+                            idade =
+                                resultado['idade'];
+
+                            genero =
+                                resultado['genero'];
+
+                            escola =
+                                resultado['escola'];
+
+                            emergencia = resultado[
+                                'emergencia'];
+
+                            observacoes = resultado[
+                                'observacoes'];
+
+                            fotoPerfil =
+                                resultado['foto'];
+                          });
+                        }
                       },
+
                       child: Container(
                         width: 140,
                         height: 140,
+
                         decoration: BoxDecoration(
                           color: Colors.white,
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 4),
+
+                          border: Border.all(
+                            color: Colors.white,
+                            width: 4,
+                          ),
                         ),
+
                         child: Stack(
                           alignment: Alignment.center,
+
                           children: [
-                            const Icon(Icons.person,
-                                size: 70, color: Colors.grey),
+                            fotoPerfil != null
+                                ? ClipOval(
+                                    child:
+                                        Image.memory(
+                                      fotoPerfil!,
+                                      width: 140,
+                                      height: 140,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )
+                                : const Icon(
+                                    Icons.person,
+                                    size: 70,
+                                    color: Colors.grey,
+                                  ),
+
                             Positioned(
                               bottom: 5,
                               right: 5,
+
                               child: Container(
-                                padding: const EdgeInsets.all(6),
-                                decoration: const BoxDecoration(
+                                padding:
+                                    const EdgeInsets
+                                        .all(6),
+
+                                decoration:
+                                    const BoxDecoration(
                                   color: Colors.blue,
-                                  shape: BoxShape.circle,
+                                  shape:
+                                      BoxShape.circle,
                                 ),
-                                child: const Icon(Icons.edit,
-                                    color: Colors.white, size: 18),
+
+                                child: const Icon(
+                                  Icons.edit,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
                               ),
                             ),
                           ],
@@ -176,10 +284,12 @@ class TelaHome extends StatelessWidget {
 
                     const SizedBox(height: 25),
 
-                    // NOME DA CRIANÇA
+                    // NOME
                     Text(
                       nomeCrianca,
+
                       textAlign: TextAlign.center,
+
                       style: const TextStyle(
                         fontSize: 30,
                         color: Colors.white,
@@ -192,8 +302,11 @@ class TelaHome extends StatelessWidget {
                     // ID
                     Text(
                       idCrianca,
+
                       style: const TextStyle(
-                          fontSize: 20, color: Colors.white70),
+                        fontSize: 20,
+                        color: Colors.white70,
+                      ),
                     ),
 
                     const SizedBox(height: 35),
@@ -201,30 +314,47 @@ class TelaHome extends StatelessWidget {
                     // ROTINA DO DIA
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(20),
+                      padding:
+                          const EdgeInsets.all(20),
+
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius:
+                            BorderRadius.circular(20),
                       ),
+
                       child: const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment:
+                            CrossAxisAlignment.start,
+
                         children: [
                           Text(
                             'Rotina de hoje',
+
                             style: TextStyle(
-                                fontSize: 24, fontWeight: FontWeight.bold),
+                              fontSize: 24,
+                              fontWeight:
+                                  FontWeight.bold,
+                            ),
                           ),
+
                           SizedBox(height: 20),
+
                           Center(
                             child: Padding(
                               padding:
-                                  EdgeInsets.symmetric(vertical: 30),
+                                  EdgeInsets.symmetric(
+                                      vertical: 30),
+
                               child: Text(
                                 'Nenhuma atividade cadastrada',
+
                                 style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.grey,
-                                    fontWeight: FontWeight.w500),
+                                  fontSize: 18,
+                                  color: Colors.grey,
+                                  fontWeight:
+                                      FontWeight.w500,
+                                ),
                               ),
                             ),
                           ),
@@ -241,26 +371,38 @@ class TelaHome extends StatelessWidget {
                           child: botaoHome(
                             icone: Icons.add,
                             texto: 'Nova atividade',
+
                             onTap: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
+                              ScaffoldMessenger.of(
+                                      context)
+                                  .showSnackBar(
                                 const SnackBar(
                                   content: Text(
-                                      'Tela Nova Atividade em desenvolvimento'),
+                                    'Tela Nova Atividade em desenvolvimento',
+                                  ),
                                 ),
                               );
                             },
                           ),
                         ),
+
                         const SizedBox(width: 20),
+
                         Expanded(
                           child: botaoHome(
-                            icone: Icons.calendar_month,
-                            texto: 'Rotina Semanal',
+                            icone:
+                                Icons.calendar_month,
+                            texto:
+                                'Rotina Semanal',
+
                             onTap: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
+                              ScaffoldMessenger.of(
+                                      context)
+                                  .showSnackBar(
                                 const SnackBar(
                                   content: Text(
-                                      'Tela Rotina Semanal em desenvolvimento'),
+                                    'Tela Rotina Semanal em desenvolvimento',
+                                  ),
                                 ),
                               );
                             },
@@ -273,11 +415,17 @@ class TelaHome extends StatelessWidget {
 
                     // TÍTULO
                     const Align(
-                      alignment: Alignment.centerLeft,
+                      alignment:
+                          Alignment.centerLeft,
+
                       child: Text(
                         'Atividades concluídas',
+
                         style: TextStyle(
-                            fontSize: 28, fontWeight: FontWeight.bold),
+                          fontSize: 28,
+                          fontWeight:
+                              FontWeight.bold,
+                        ),
                       ),
                     ),
 
@@ -286,16 +434,24 @@ class TelaHome extends StatelessWidget {
                     // VAZIO
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(25),
+
+                      padding:
+                          const EdgeInsets.all(25),
+
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius:
+                            BorderRadius.circular(20),
                       ),
+
                       child: const Center(
                         child: Text(
                           'Nenhuma atividade concluída',
-                          style:
-                              TextStyle(fontSize: 18, color: Colors.grey),
+
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.grey,
+                          ),
                         ),
                       ),
                     ),
@@ -317,11 +473,15 @@ class TelaHome extends StatelessWidget {
   }) {
     return GestureDetector(
       onTap: onTap,
+
       child: Container(
         height: 130,
+
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius:
+              BorderRadius.circular(20),
+
           boxShadow: const [
             BoxShadow(
               color: Colors.black12,
@@ -330,16 +490,28 @@ class TelaHome extends StatelessWidget {
             ),
           ],
         ),
+
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment:
+              MainAxisAlignment.center,
+
           children: [
-            Icon(icone, size: 45),
+            Icon(
+              icone,
+              size: 45,
+            ),
+
             const SizedBox(height: 12),
+
             Text(
               texto,
+
               textAlign: TextAlign.center,
+
               style: const TextStyle(
-                  fontSize: 18, fontWeight: FontWeight.w600),
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),
