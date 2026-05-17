@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:typed_data';
+// IMPORTANTE: Adicione a importação do arquivo da Ficha Médica aqui. 
+// Ajuste o caminho conforme a estrutura de pastas do seu grupo:
+import 'ficha_medica_screen.dart'; 
 
 class TelaPerfil extends StatefulWidget {
   final String nome;
@@ -69,21 +72,22 @@ class _TelaPerfilState extends State<TelaPerfil> {
 
   final TextEditingController observacoesController =
       TextEditingController(text: "ALÉRGICA A Farofa");
+      
   @override
-void initState() {
-  super.initState();
+  void initState() {
+    super.initState();
 
-  genero = widget.genero;
+    genero = widget.genero;
 
-  nomeController.text = widget.nome;
-  idadeNumeroController.text = widget.idade;
-  escolaController.text = widget.escola;
-  emergenciaController.text = widget.emergencia;
-  observacoesController.text =
-      widget.observacoes;
+    nomeController.text = widget.nome;
+    idadeNumeroController.text = widget.idade;
+    escolaController.text = widget.escola;
+    emergenciaController.text = widget.emergencia;
+    observacoesController.text =
+        widget.observacoes;
 
-  _imageBytes = widget.foto;
-}
+    _imageBytes = widget.foto;
+  }
 
   @override
   void dispose() {
@@ -327,14 +331,14 @@ void initState() {
                 onPressed: () {
                   if (isEditing) {
                     Navigator.pop(context, {
-  'nome': nomeController.text,
-  'idade': idadeNumeroController.text,
-  'genero': genero,
-  'escola': escolaController.text,
-  'emergencia': emergenciaController.text,
-  'observacoes': observacoesController.text,
-  'foto': _imageBytes,
-});
+                      'nome': nomeController.text,
+                      'idade': idadeNumeroController.text,
+                      'genero': genero,
+                      'escola': escolaController.text,
+                      'emergencia': emergenciaController.text,
+                      'observacoes': observacoesController.text,
+                      'foto': _imageBytes,
+                    });
                   } else {
                     setState(() {
                       isEditing = true;
@@ -660,7 +664,20 @@ void initState() {
             ),
           ),
 
-          onPressed: () {},
+          // AQUI FIZEMOS A CONEXÃO ENTRE AS TELAS:
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => FichaMedicaScreen(
+                  // Pega o nome digitado no controlador e envia pra Ficha Médica
+                  nome: nomeController.text.isEmpty ? 'Criança' : nomeController.text,
+                  // Junta o número da idade com a unidade (ex: "5" + " " + "anos")
+                  idade: "${idadeNumeroController.text} $unidadeIdade",
+                ),
+              ),
+            );
+          },
 
           child: const Text(
             "Ver Ficha Médica Completa",
