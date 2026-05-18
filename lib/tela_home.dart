@@ -371,17 +371,9 @@ class _TelaHomeState extends State<TelaHome> {
                           child: botaoHome(
                             icone: Icons.add,
                             texto: 'Nova atividade',
-
                             onTap: () {
-                              ScaffoldMessenger.of(
-                                      context)
-                                  .showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Tela Nova Atividade em desenvolvimento',
-                                  ),
-                                ),
-                              );
+                              // MODIFICADO: Agora abre a sua nova tela usando a rota cadastrada no main.dart
+                              Navigator.pushNamed(context, '/nova-atividade');
                             },
                           ),
                         ),
