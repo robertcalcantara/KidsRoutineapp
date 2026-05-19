@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'dart:typed_data';
+
 import 'widgets/navbar.dart';
 import 'Tela_perfil.dart';
+import 'atividade.dart';
+import 'tela_nova_atividade.dart';
+import 'app_data.dart';
 
 class TelaHome extends StatefulWidget {
   final String nomeCrianca;
@@ -18,31 +22,43 @@ class TelaHome extends StatefulWidget {
 }
 
 class _TelaHomeState extends State<TelaHome> {
-  late String nomeCrianca;
-  late String idCrianca;
 
-  String escola = "Escola UNIT";
-  String emergencia = "Mãe (79) 98888-7777";
-  String observacoes = "ALÉRGICA A Farofa";
-  String idade = "3";
-  String genero = "feminino";
+  String get nomeCrianca =>
+      AppData.nomeCrianca;
 
-  Uint8List? fotoPerfil;
+  String get idCrianca =>
+      AppData.idCrianca;
 
-  @override
-  void initState() {
-    super.initState();
+  String get escola =>
+      AppData.escola;
 
-    nomeCrianca = widget.nomeCrianca;
-    idCrianca = widget.idCrianca;
-  }
+  String get emergencia =>
+      AppData.emergencia;
+
+  String get observacoes =>
+      AppData.observacoes;
+
+  String get idade =>
+      AppData.idade;
+
+  String get genero =>
+      AppData.genero;
+
+  Uint8List? get fotoPerfil =>
+      AppData.fotoPerfil;
+
+  List<Atividade> get atividades =>
+      AppData.atividades;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
 
-      bottomNavigationBar: const Navbar(
+    return Scaffold(
+      backgroundColor:
+          const Color(0xFFF5F5F5),
+
+      bottomNavigationBar:
+          const Navbar(
         currentIndex: 0,
       ),
 
@@ -50,18 +66,26 @@ class _TelaHomeState extends State<TelaHome> {
         child: SingleChildScrollView(
           child: Column(
             children: [
+
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(24),
 
-                decoration: const BoxDecoration(
+                padding:
+                    const EdgeInsets.all(24),
+
+                decoration:
+                    const BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
                       Color(0xFF1976D2),
                       Color(0xFFD6E8F7),
                     ],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
+
+                    begin:
+                        Alignment.topCenter,
+
+                    end:
+                        Alignment.bottomCenter,
                   ),
                 ),
 
@@ -70,76 +94,97 @@ class _TelaHomeState extends State<TelaHome> {
 
                     // TOPO
                     Align(
-                      alignment: Alignment.topRight,
+                      alignment:
+                          Alignment.topRight,
 
                       child: Column(
                         children: [
 
-                          // LOGO
                           Container(
                             width: 58,
                             height: 58,
 
-                            decoration: BoxDecoration(
-                              color: Colors.white,
+                            decoration:
+                                BoxDecoration(
+                              color:
+                                  Colors.white,
+
                               borderRadius:
-                                  BorderRadius.circular(100),
+                                  BorderRadius
+                                      .circular(
+                                          100),
                             ),
 
                             child: ClipRRect(
                               borderRadius:
-                                  BorderRadius.circular(100),
+                                  BorderRadius
+                                      .circular(
+                                          100),
 
-                              child: Image.asset(
+                              child:
+                                  Image.asset(
                                 'assets/images/logo.png',
                                 fit: BoxFit.cover,
                               ),
                             ),
                           ),
 
-                          const SizedBox(height: 8),
+                          const SizedBox(
+                              height: 8),
 
-                          // BOTÃO SAIR
                           GestureDetector(
                             onTap: () async {
 
                               final confirmar =
-                                  await showDialog<bool>(
-                                context: context,
+                                  await showDialog<
+                                      bool>(
+                                context:
+                                    context,
 
-                                builder: (context) {
+                                builder:
+                                    (context) {
+
                                   return AlertDialog(
-                                    title: const Text(
+                                    title:
+                                        const Text(
                                       'Confirmar saída',
                                     ),
 
-                                    content: const Text(
+                                    content:
+                                        const Text(
                                       'Deseja realmente sair?',
                                     ),
 
                                     actions: [
+
                                       TextButton(
-                                        onPressed: () {
+                                        onPressed:
+                                            () {
+
                                           Navigator.pop(
                                             context,
                                             false,
                                           );
                                         },
 
-                                        child: const Text(
+                                        child:
+                                            const Text(
                                           'Cancelar',
                                         ),
                                       ),
 
                                       ElevatedButton(
-                                        onPressed: () {
+                                        onPressed:
+                                            () {
+
                                           Navigator.pop(
                                             context,
                                             true,
                                           );
                                         },
 
-                                        child: const Text(
+                                        child:
+                                            const Text(
                                           'Sair',
                                         ),
                                       ),
@@ -148,8 +193,11 @@ class _TelaHomeState extends State<TelaHome> {
                                 },
                               );
 
-                              if (confirmar == true) {
-                                Navigator.pushReplacementNamed(
+                              if (confirmar ==
+                                  true) {
+
+                                Navigator
+                                    .pushReplacementNamed(
                                   context,
                                   '/',
                                 );
@@ -159,9 +207,15 @@ class _TelaHomeState extends State<TelaHome> {
                             child: const Text(
                               'Sair',
 
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
+                              style:
+                                  TextStyle(
+                                color:
+                                    Colors.white,
+
+                                fontWeight:
+                                    FontWeight
+                                        .bold,
+
                                 fontSize: 16,
                               ),
                             ),
@@ -170,52 +224,85 @@ class _TelaHomeState extends State<TelaHome> {
                       ),
                     ),
 
-                    const SizedBox(height: 20),
+                    const SizedBox(
+                        height: 20),
 
                     // FOTO PERFIL
                     GestureDetector(
                       onTap: () async {
+
                         final resultado =
-                            await Navigator.push(
+                            await Navigator
+                                .push(
                           context,
 
                           MaterialPageRoute(
-                            builder: (context) =>
-                                TelaPerfil(
-                              nome: nomeCrianca,
-                              idade: idade,
-                              genero: genero,
-                              escola: escola,
-                              emergencia: emergencia,
+                            builder:
+                                (context) =>
+                                    TelaPerfil(
+                              nome:
+                                  nomeCrianca,
+
+                              idade:
+                                  idade,
+
+                              genero:
+                                  genero,
+
+                              escola:
+                                  escola,
+
+                              emergencia:
+                                  emergencia,
+
                               observacoes:
                                   observacoes,
-                              foto: fotoPerfil,
+
+                              foto:
+                                  fotoPerfil,
                             ),
                           ),
                         );
 
-                        if (resultado != null) {
+                        if (resultado !=
+                            null) {
+
                           setState(() {
-                            nomeCrianca =
-                                resultado['nome'];
 
-                            idade =
-                                resultado['idade'];
+                            AppData
+                                    .nomeCrianca =
+                                resultado[
+                                    'nome'];
 
-                            genero =
-                                resultado['genero'];
+                            AppData
+                                    .idade =
+                                resultado[
+                                    'idade'];
 
-                            escola =
-                                resultado['escola'];
+                            AppData
+                                    .genero =
+                                resultado[
+                                    'genero'];
 
-                            emergencia = resultado[
-                                'emergencia'];
+                            AppData
+                                    .escola =
+                                resultado[
+                                    'escola'];
 
-                            observacoes = resultado[
-                                'observacoes'];
+                            AppData
+                                    .emergencia =
+                                resultado[
+                                    'emergencia'];
 
-                            fotoPerfil =
-                                resultado['foto'];
+                            AppData
+                                    .observacoes =
+                                resultado[
+                                    'observacoes'];
+
+                            AppData
+                                    .fotoPerfil =
+                                resultado[
+                                    'foto'];
                           });
                         }
                       },
@@ -224,55 +311,89 @@ class _TelaHomeState extends State<TelaHome> {
                         width: 140,
                         height: 140,
 
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
+                        decoration:
+                            BoxDecoration(
+                          color:
+                              Colors.white,
 
-                          border: Border.all(
-                            color: Colors.white,
+                          shape:
+                              BoxShape.circle,
+
+                          border:
+                              Border.all(
+                            color:
+                                Colors.white,
+
                             width: 4,
                           ),
                         ),
 
                         child: Stack(
-                          alignment: Alignment.center,
+                          alignment:
+                              Alignment.center,
 
                           children: [
-                            fotoPerfil != null
+
+                            fotoPerfil !=
+                                    null
+
                                 ? ClipOval(
                                     child:
                                         Image.memory(
                                       fotoPerfil!,
-                                      width: 140,
-                                      height: 140,
-                                      fit: BoxFit.cover,
+
+                                      width:
+                                          140,
+
+                                      height:
+                                          140,
+
+                                      fit:
+                                          BoxFit
+                                              .cover,
                                     ),
                                   )
+
                                 : const Icon(
                                     Icons.person,
+
                                     size: 70,
-                                    color: Colors.grey,
+
+                                    color:
+                                        Colors
+                                            .grey,
                                   ),
 
                             Positioned(
                               bottom: 5,
                               right: 5,
 
-                              child: Container(
+                              child:
+                                  Container(
                                 padding:
                                     const EdgeInsets
-                                        .all(6),
+                                        .all(
+                                            6),
 
                                 decoration:
                                     const BoxDecoration(
-                                  color: Colors.blue,
+                                  color:
+                                      Colors
+                                          .blue,
+
                                   shape:
-                                      BoxShape.circle,
+                                      BoxShape
+                                          .circle,
                                 ),
 
-                                child: const Icon(
+                                child:
+                                    const Icon(
                                   Icons.edit,
-                                  color: Colors.white,
+
+                                  color:
+                                      Colors
+                                          .white,
+
                                   size: 18,
                                 ),
                               ),
@@ -282,115 +403,326 @@ class _TelaHomeState extends State<TelaHome> {
                       ),
                     ),
 
-                    const SizedBox(height: 25),
+                    const SizedBox(
+                        height: 25),
 
                     // NOME
                     Text(
                       nomeCrianca,
 
-                      textAlign: TextAlign.center,
+                      textAlign:
+                          TextAlign.center,
 
-                      style: const TextStyle(
+                      style:
+                          const TextStyle(
                         fontSize: 30,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+
+                        color:
+                            Colors.white,
+
+                        fontWeight:
+                            FontWeight.bold,
                       ),
                     ),
 
-                    const SizedBox(height: 8),
+                    const SizedBox(
+                        height: 8),
 
                     // ID
                     Text(
                       idCrianca,
 
-                      style: const TextStyle(
+                      style:
+                          const TextStyle(
                         fontSize: 20,
-                        color: Colors.white70,
+
+                        color:
+                            Colors.white70,
                       ),
                     ),
 
-                    const SizedBox(height: 35),
+                    const SizedBox(
+                        height: 35),
 
-                    // ROTINA DO DIA
+                    // ROTINA DE HOJE
                     Container(
-                      width: double.infinity,
-                      padding:
-                          const EdgeInsets.all(20),
+                      width:
+                          double.infinity,
 
-                      decoration: BoxDecoration(
-                        color: Colors.white,
+                      padding:
+                          const EdgeInsets
+                              .all(20),
+
+                      decoration:
+                          BoxDecoration(
+                        color:
+                            Colors.white,
+
                         borderRadius:
-                            BorderRadius.circular(20),
+                            BorderRadius
+                                .circular(
+                                    20),
                       ),
 
-                      child: const Column(
+                      child: Column(
                         crossAxisAlignment:
-                            CrossAxisAlignment.start,
+                            CrossAxisAlignment
+                                .start,
 
                         children: [
-                          Text(
+
+                          const Text(
                             'Rotina de hoje',
 
-                            style: TextStyle(
+                            style:
+                                TextStyle(
                               fontSize: 24,
+
                               fontWeight:
-                                  FontWeight.bold,
+                                  FontWeight
+                                      .bold,
                             ),
                           ),
 
-                          SizedBox(height: 20),
+                          const SizedBox(
+                              height: 20),
 
-                          Center(
-                            child: Padding(
-                              padding:
-                                  EdgeInsets.symmetric(
-                                      vertical: 30),
+                          atividades
+                                  .isEmpty
 
-                              child: Text(
-                                'Nenhuma atividade cadastrada',
+                              ? const Center(
+                                  child:
+                                      Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(
+                                      vertical:
+                                          30,
+                                    ),
 
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.grey,
-                                  fontWeight:
-                                      FontWeight.w500,
+                                    child:
+                                        Text(
+                                      'Nenhuma atividade cadastrada',
+
+                                      style:
+                                          TextStyle(
+                                        fontSize:
+                                            18,
+
+                                        color:
+                                            Colors.grey,
+
+                                        fontWeight:
+                                            FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                )
+
+                              : Column(
+                                  children:
+                                      atividades
+                                          .map(
+                                    (
+                                      atividade,
+                                    ) {
+
+                                      return Container(
+                                        margin:
+                                            const EdgeInsets.only(
+                                          bottom:
+                                              15,
+                                        ),
+
+                                        padding:
+                                            const EdgeInsets.all(
+                                                16),
+
+                                        decoration:
+                                            BoxDecoration(
+                                          color:
+                                              const Color(
+                                            0xFFF5F7FA,
+                                          ),
+
+                                          borderRadius:
+                                              BorderRadius.circular(
+                                            16,
+                                          ),
+                                        ),
+
+                                        child:
+                                            Row(
+                                          children: [
+
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.all(
+                                                      12),
+
+                                              decoration:
+                                                  BoxDecoration(
+                                                color: Colors
+                                                    .blue
+                                                    .shade100,
+
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                  12,
+                                                ),
+                                              ),
+
+                                              child:
+                                                  Icon(
+
+                                                atividade.categoria ==
+                                                        'Sono'
+                                                    ? Icons.bed
+
+                                                    : atividade.categoria ==
+                                                            'Alimentação'
+                                                        ? Icons.restaurant
+
+                                                        : atividade.categoria ==
+                                                                'Estudos'
+                                                            ? Icons.menu_book
+
+                                                            : atividade.categoria ==
+                                                                    'Lazer'
+                                                                ? Icons.sports_esports
+
+                                                                : atividade.categoria ==
+                                                                        'Medicação'
+                                                                    ? Icons.medication
+
+                                                                    : Icons.task,
+
+                                                color:
+                                                    Colors.blue,
+                                              ),
+                                            ),
+
+                                            const SizedBox(
+                                                width:
+                                                    15),
+
+                                            Expanded(
+                                              child:
+                                                  Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+
+                                                children: [
+
+                                                  Text(
+                                                    atividade.nome,
+
+                                                    style:
+                                                        const TextStyle(
+                                                      fontSize:
+                                                          18,
+
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+
+                                                  const SizedBox(
+                                                      height:
+                                                          5),
+
+                                                  Text(
+                                                    '${atividade.inicio} - ${atividade.fim}',
+
+                                                    style:
+                                                        const TextStyle(
+                                                      color:
+                                                          Colors.grey,
+
+                                                      fontSize:
+                                                          15,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  ).toList(),
                                 ),
-                              ),
-                            ),
-                          ),
                         ],
                       ),
                     ),
 
-                    const SizedBox(height: 30),
+                    const SizedBox(
+                        height: 30),
 
                     // BOTÕES
                     Row(
                       children: [
+
                         Expanded(
-                          child: botaoHome(
-                            icone: Icons.add,
-                            texto: 'Nova atividade',
-                            onTap: () {
-                              // MODIFICADO: Agora abre a sua nova tela usando a rota cadastrada no main.dart
-                              Navigator.pushNamed(context, '/nova-atividade');
+                          child:
+                              botaoHome(
+                            icone:
+                                Icons.add,
+
+                            texto:
+                                'Nova atividade',
+
+                            onTap:
+                                () async {
+
+                              final novaAtividade =
+                                  await Navigator.push(
+                                context,
+
+                                MaterialPageRoute(
+                                  builder:
+                                      (
+                                    context,
+                                  ) =>
+                                          const NovaAtividadeScreen(),
+                                ),
+                              );
+
+                              if (novaAtividade !=
+                                  null) {
+
+                                setState(() {
+
+                                  AppData
+                                      .atividades
+                                      .add(
+                                    novaAtividade,
+                                  );
+                                });
+                              }
                             },
                           ),
                         ),
 
-                        const SizedBox(width: 20),
+                        const SizedBox(
+                            width: 20),
 
                         Expanded(
-                          child: botaoHome(
-                            icone:
-                                Icons.calendar_month,
+                          child:
+                              botaoHome(
+                            icone: Icons
+                                .calendar_month,
+
                             texto:
                                 'Rotina Semanal',
 
-                            onTap: () {
-                              ScaffoldMessenger.of(
-                                      context)
+                            onTap:
+                                () {
+
+                              ScaffoldMessenger
+                                      .of(
+                                          context)
                                   .showSnackBar(
+
                                 const SnackBar(
                                   content: Text(
                                     'Tela Rotina Semanal em desenvolvimento',
@@ -403,9 +735,10 @@ class _TelaHomeState extends State<TelaHome> {
                       ],
                     ),
 
-                    const SizedBox(height: 40),
+                    const SizedBox(
+                        height: 40),
 
-                    // TÍTULO
+                    // ATIVIDADES CONCLUÍDAS
                     const Align(
                       alignment:
                           Alignment.centerLeft,
@@ -413,40 +746,57 @@ class _TelaHomeState extends State<TelaHome> {
                       child: Text(
                         'Atividades concluídas',
 
-                        style: TextStyle(
+                        style:
+                            TextStyle(
                           fontSize: 28,
+
                           fontWeight:
-                              FontWeight.bold,
+                              FontWeight
+                                  .bold,
                         ),
                       ),
                     ),
 
-                    const SizedBox(height: 20),
+                    const SizedBox(
+                        height: 20),
 
-                    // VAZIO
                     Container(
-                      width: double.infinity,
+                      width:
+                          double.infinity,
 
                       padding:
-                          const EdgeInsets.all(25),
+                          const EdgeInsets
+                              .all(25),
 
-                      decoration: BoxDecoration(
-                        color: Colors.white,
+                      decoration:
+                          BoxDecoration(
+                        color:
+                            Colors.white,
+
                         borderRadius:
-                            BorderRadius.circular(20),
+                            BorderRadius
+                                .circular(
+                                    20),
                       ),
 
-                      child: const Center(
+                      child:
+                          const Center(
                         child: Text(
                           'Nenhuma atividade concluída',
 
-                          style: TextStyle(
+                          style:
+                              TextStyle(
                             fontSize: 18,
-                            color: Colors.grey,
+
+                            color:
+                                Colors.grey,
                           ),
                         ),
                       ),
                     ),
+
+                    const SizedBox(
+                        height: 40),
                   ],
                 ),
               ),
@@ -459,50 +809,74 @@ class _TelaHomeState extends State<TelaHome> {
 
   // BOTÃO HOME
   Widget botaoHome({
-    required IconData icone,
+    required IconData
+        icone,
+
     required String texto,
-    required VoidCallback onTap,
+
+    required VoidCallback
+        onTap,
   }) {
+
     return GestureDetector(
       onTap: onTap,
 
       child: Container(
         height: 130,
 
-        decoration: BoxDecoration(
-          color: Colors.white,
+        decoration:
+            BoxDecoration(
+          color:
+              Colors.white,
+
           borderRadius:
-              BorderRadius.circular(20),
+              BorderRadius
+                  .circular(
+            20,
+          ),
 
           boxShadow: const [
+
             BoxShadow(
-              color: Colors.black12,
+              color:
+                  Colors.black12,
+
               blurRadius: 8,
-              offset: Offset(0, 4),
+
+              offset:
+                  Offset(0, 4),
             ),
           ],
         ),
 
         child: Column(
           mainAxisAlignment:
-              MainAxisAlignment.center,
+              MainAxisAlignment
+                  .center,
 
           children: [
+
             Icon(
               icone,
               size: 45,
             ),
 
-            const SizedBox(height: 12),
+            const SizedBox(
+                height: 12),
 
             Text(
               texto,
 
-              textAlign: TextAlign.center,
+              textAlign:
+                  TextAlign.center,
 
-              style: const TextStyle(
+              style:
+                  const TextStyle(
                 fontSize: 18,
-                fontWeight: FontWeight.w600,
+
+                fontWeight:
+                    FontWeight
+                        .w600,
               ),
             ),
           ],
