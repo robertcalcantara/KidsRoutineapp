@@ -10,10 +10,10 @@ class FichaMedicaScreen extends StatefulWidget {
   final String idade;
 
   const FichaMedicaScreen({
-    Key? key,
+    super.key,
     required this.nome,
     required this.idade,
-  }) : super(key: key);
+  });
 
   @override
   State<FichaMedicaScreen> createState() => _FichaMedicaScreenState();
