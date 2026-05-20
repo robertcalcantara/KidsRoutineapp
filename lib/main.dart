@@ -55,7 +55,6 @@ class KidsRoutineApp extends StatelessWidget {
         // NOVA ATIVIDADE
         '/nova-atividade': (context) => const NovaAtividadeScreen(),
 
-        // ROTINA
         '/rotina': (context) => const TelaRotina(),
       },
     );
