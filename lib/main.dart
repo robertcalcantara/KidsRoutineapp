@@ -6,11 +6,10 @@ import 'tela_home.dart';
 import 'tela_historico.dart';
 import 'tela_configuracoes.dart';
 import 'tela_nova_atividade.dart';
+import 'tela_rotina.dart';
 
 void main() {
-  runApp(
-    const KidsRoutineApp(),
-  );
+  runApp(const KidsRoutineApp());
 }
 
 class KidsRoutineApp extends StatelessWidget {
@@ -20,34 +19,45 @@ class KidsRoutineApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+
       title: 'Kids Routine',
+
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF1565C0),
-        ),
+
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF1565C0)),
+
         useMaterial3: true,
       ),
+
       initialRoute: '/',
+
       routes: {
         // LOGIN
         '/': (context) => const TelaLogin(),
+
         // CADASTRO
         '/cadastro': (context) => const TelaCadastro(),
+
         // RECUPERAR SENHA
         '/recuperar-senha': (context) => const TelaRecuperarSenha(),
+
         // HOME
-        '/home': (context) => const TelaHome(
-              nomeCrianca: 'Perfil Teste',
-              idCrianca: '#0000',
-            ),
+        '/home': (context) =>
+            const TelaHome(nomeCrianca: 'Perfil Teste', idCrianca: '#0000'),
+
         // HISTÓRICO
         '/historico': (context) => const TelaHistorico(),
+
         // CONFIGURAÇÕES
         '/configuracoes': (context) => const TelaConfiguracoes(),
+
         // NOVA ATIVIDADE
-        '/nova-atividade': (context) => const NovaAtividadeScreen(), 
-      }, 
-    ); 
+        '/nova-atividade': (context) => const NovaAtividadeScreen(),
+
+        // ROTINA
+        '/rotina': (context) => const TelaRotina(),
+      },
+    );
   }
 }
