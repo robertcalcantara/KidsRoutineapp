@@ -22,200 +22,102 @@ class TelaHome extends StatefulWidget {
 }
 
 class _TelaHomeState extends State<TelaHome> {
+  String get nomeCrianca => AppData.nomeCrianca;
 
-  String get nomeCrianca =>
-      AppData.nomeCrianca;
+  String get idCrianca => AppData.idCrianca;
 
-  String get idCrianca =>
-      AppData.idCrianca;
+  String get escola => AppData.escola;
 
-  String get escola =>
-      AppData.escola;
+  String get emergencia => AppData.emergencia;
 
-  String get emergencia =>
-      AppData.emergencia;
+  String get observacoes => AppData.observacoes;
 
-  String get observacoes =>
-      AppData.observacoes;
+  String get idade => AppData.idade;
 
-  String get idade =>
-      AppData.idade;
+  String get genero => AppData.genero;
 
-  String get genero =>
-      AppData.genero;
+  Uint8List? get fotoPerfil => AppData.fotoPerfil;
 
-  Uint8List? get fotoPerfil =>
-      AppData.fotoPerfil;
-
-  List<Atividade> get atividades =>
-      AppData.atividades;
+  List<Atividade> get atividades => AppData.atividades;
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      backgroundColor:
-          const Color(0xFFF5F5F5),
+      backgroundColor: const Color(0xFFF5F5F5),
 
-      bottomNavigationBar:
-          const Navbar(
-        currentIndex: 0,
-      ),
+      bottomNavigationBar: const Navbar(currentIndex: 0),
 
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             children: [
-
               Container(
                 width: double.infinity,
 
-                padding:
-                    const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(24),
 
-                decoration:
-                    const BoxDecoration(
+                decoration: const BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [
-                      Color(0xFF1976D2),
-                      Color(0xFFD6E8F7),
-                    ],
+                    colors: [Color(0xFF1976D2), Color(0xFFD6E8F7)],
 
-                    begin:
-                        Alignment.topCenter,
+                    begin: Alignment.topCenter,
 
-                    end:
-                        Alignment.bottomCenter,
+                    end: Alignment.bottomCenter,
                   ),
                 ),
 
                 child: Column(
                   children: [
-
                     // TOPO
                     Align(
-                      alignment:
-                          Alignment.topRight,
-
+                      alignment: Alignment.topRight,
                       child: Column(
                         children: [
-
-                          Container(
-                            width: 58,
-                            height: 58,
-
-                            decoration:
-                                BoxDecoration(
-                              color:
-                                  Colors.white,
-
-                              borderRadius:
-                                  BorderRadius
-                                      .circular(
-                                          100),
-                            ),
-
-                            child: ClipRRect(
-                              borderRadius:
-                                  BorderRadius
-                                      .circular(
-                                          100),
-
-                              child:
-                                  Image.asset(
-                                'assets/images/logo.png',
-                                fit: BoxFit.cover,
-                              ),
+                          // Aqui está a logo ajustada
+                          SizedBox(
+                            width: 80,
+                            height: 80,
+                            child: Image.asset(
+                              'assets/images/logo.png',
+                              fit: BoxFit.contain,
                             ),
                           ),
-
-                          const SizedBox(
-                              height: 8),
-
+                          const SizedBox(height: 8),
                           GestureDetector(
                             onTap: () async {
-
-                              final confirmar =
-                                  await showDialog<
-                                      bool>(
-                                context:
-                                    context,
-
-                                builder:
-                                    (context) {
-
+                              final confirmar = await showDialog<bool>(
+                                context: context,
+                                builder: (context) {
                                   return AlertDialog(
-                                    title:
-                                        const Text(
-                                      'Confirmar saída',
-                                    ),
-
-                                    content:
-                                        const Text(
+                                    title: const Text('Confirmar saída'),
+                                    content: const Text(
                                       'Deseja realmente sair?',
                                     ),
-
                                     actions: [
-
                                       TextButton(
-                                        onPressed:
-                                            () {
-
-                                          Navigator.pop(
-                                            context,
-                                            false,
-                                          );
-                                        },
-
-                                        child:
-                                            const Text(
-                                          'Cancelar',
-                                        ),
+                                        onPressed: () =>
+                                            Navigator.pop(context, false),
+                                        child: const Text('Cancelar'),
                                       ),
-
                                       ElevatedButton(
-                                        onPressed:
-                                            () {
-
-                                          Navigator.pop(
-                                            context,
-                                            true,
-                                          );
-                                        },
-
-                                        child:
-                                            const Text(
-                                          'Sair',
-                                        ),
+                                        onPressed: () =>
+                                            Navigator.pop(context, true),
+                                        child: const Text('Sair'),
                                       ),
                                     ],
                                   );
                                 },
                               );
 
-                              if (confirmar ==
-                                  true) {
-
-                                Navigator
-                                    .pushReplacementNamed(
-                                  context,
-                                  '/',
-                                );
+                              if (confirmar == true) {
+                                Navigator.pushReplacementNamed(context, '/');
                               }
                             },
-
                             child: const Text(
                               'Sair',
-
-                              style:
-                                  TextStyle(
-                                color:
-                                    Colors.white,
-
-                                fontWeight:
-                                    FontWeight
-                                        .bold,
-
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
                                 fontSize: 16,
                               ),
                             ),
@@ -224,85 +126,48 @@ class _TelaHomeState extends State<TelaHome> {
                       ),
                     ),
 
-                    const SizedBox(
-                        height: 20),
+                    const SizedBox(height: 20),
 
                     // FOTO PERFIL
                     GestureDetector(
                       onTap: () async {
-
-                        final resultado =
-                            await Navigator
-                                .push(
+                        final resultado = await Navigator.push(
                           context,
 
                           MaterialPageRoute(
-                            builder:
-                                (context) =>
-                                    TelaPerfil(
-                              nome:
-                                  nomeCrianca,
+                            builder: (context) => TelaPerfil(
+                              nome: nomeCrianca,
 
-                              idade:
-                                  idade,
+                              idade: idade,
 
-                              genero:
-                                  genero,
+                              genero: genero,
 
-                              escola:
-                                  escola,
+                              escola: escola,
 
-                              emergencia:
-                                  emergencia,
+                              emergencia: emergencia,
 
-                              observacoes:
-                                  observacoes,
+                              observacoes: observacoes,
 
-                              foto:
-                                  fotoPerfil,
+                              foto: fotoPerfil,
                             ),
                           ),
                         );
 
-                        if (resultado !=
-                            null) {
-
+                        if (resultado != null) {
                           setState(() {
+                            AppData.nomeCrianca = resultado['nome'];
 
-                            AppData
-                                    .nomeCrianca =
-                                resultado[
-                                    'nome'];
+                            AppData.idade = resultado['idade'];
 
-                            AppData
-                                    .idade =
-                                resultado[
-                                    'idade'];
+                            AppData.genero = resultado['genero'];
 
-                            AppData
-                                    .genero =
-                                resultado[
-                                    'genero'];
+                            AppData.escola = resultado['escola'];
 
-                            AppData
-                                    .escola =
-                                resultado[
-                                    'escola'];
+                            AppData.emergencia = resultado['emergencia'];
 
-                            AppData
-                                    .emergencia =
-                                resultado[
-                                    'emergencia'];
+                            AppData.observacoes = resultado['observacoes'];
 
-                            AppData
-                                    .observacoes =
-                                resultado[
-                                    'observacoes'];
-
-                            AppData
-                                    .fotoPerfil =
-                                resultado[
-                                    'foto'];
+                            AppData.fotoPerfil = resultado['foto'];
                           });
                         }
                       },
@@ -311,88 +176,55 @@ class _TelaHomeState extends State<TelaHome> {
                         width: 140,
                         height: 140,
 
-                        decoration:
-                            BoxDecoration(
-                          color:
-                              Colors.white,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
 
-                          shape:
-                              BoxShape.circle,
+                          shape: BoxShape.circle,
 
-                          border:
-                              Border.all(
-                            color:
-                                Colors.white,
-
-                            width: 4,
-                          ),
+                          border: Border.all(color: Colors.white, width: 4),
                         ),
 
                         child: Stack(
-                          alignment:
-                              Alignment.center,
+                          alignment: Alignment.center,
 
                           children: [
-
-                            fotoPerfil !=
-                                    null
-
+                            fotoPerfil != null
                                 ? ClipOval(
-                                    child:
-                                        Image.memory(
+                                    child: Image.memory(
                                       fotoPerfil!,
 
-                                      width:
-                                          140,
+                                      width: 140,
 
-                                      height:
-                                          140,
+                                      height: 140,
 
-                                      fit:
-                                          BoxFit
-                                              .cover,
+                                      fit: BoxFit.cover,
                                     ),
                                   )
-
                                 : const Icon(
                                     Icons.person,
 
                                     size: 70,
 
-                                    color:
-                                        Colors
-                                            .grey,
+                                    color: Colors.grey,
                                   ),
 
                             Positioned(
                               bottom: 5,
                               right: 5,
 
-                              child:
-                                  Container(
-                                padding:
-                                    const EdgeInsets
-                                        .all(
-                                            6),
+                              child: Container(
+                                padding: const EdgeInsets.all(6),
 
-                                decoration:
-                                    const BoxDecoration(
-                                  color:
-                                      Colors
-                                          .blue,
+                                decoration: const BoxDecoration(
+                                  color: Colors.blue,
 
-                                  shape:
-                                      BoxShape
-                                          .circle,
+                                  shape: BoxShape.circle,
                                 ),
 
-                                child:
-                                    const Icon(
+                                child: const Icon(
                                   Icons.edit,
 
-                                  color:
-                                      Colors
-                                          .white,
+                                  color: Colors.white,
 
                                   size: 18,
                                 ),
@@ -403,326 +235,211 @@ class _TelaHomeState extends State<TelaHome> {
                       ),
                     ),
 
-                    const SizedBox(
-                        height: 25),
+                    const SizedBox(height: 25),
 
                     // NOME
                     Text(
                       nomeCrianca,
 
-                      textAlign:
-                          TextAlign.center,
+                      textAlign: TextAlign.center,
 
-                      style:
-                          const TextStyle(
+                      style: const TextStyle(
                         fontSize: 30,
 
-                        color:
-                            Colors.white,
+                        color: Colors.white,
 
-                        fontWeight:
-                            FontWeight.bold,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
 
-                    const SizedBox(
-                        height: 8),
+                    const SizedBox(height: 8),
 
                     // ID
                     Text(
                       idCrianca,
 
-                      style:
-                          const TextStyle(
+                      style: const TextStyle(
                         fontSize: 20,
 
-                        color:
-                            Colors.white70,
+                        color: Colors.white70,
                       ),
                     ),
 
-                    const SizedBox(
-                        height: 35),
+                    const SizedBox(height: 35),
 
                     // ROTINA DE HOJE
                     Container(
-                      width:
-                          double.infinity,
+                      width: double.infinity,
 
-                      padding:
-                          const EdgeInsets
-                              .all(20),
+                      padding: const EdgeInsets.all(20),
 
-                      decoration:
-                          BoxDecoration(
-                        color:
-                            Colors.white,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
 
-                        borderRadius:
-                            BorderRadius
-                                .circular(
-                                    20),
+                        borderRadius: BorderRadius.circular(20),
                       ),
 
                       child: Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment
-                                .start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
 
                         children: [
-
                           const Text(
                             'Rotina de hoje',
 
-                            style:
-                                TextStyle(
+                            style: TextStyle(
                               fontSize: 24,
 
-                              fontWeight:
-                                  FontWeight
-                                      .bold,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
 
-                          const SizedBox(
-                              height: 20),
+                          const SizedBox(height: 20),
 
-                          atividades
-                                  .isEmpty
-
+                          atividades.isEmpty
                               ? const Center(
-                                  child:
-                                      Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(
-                                      vertical:
-                                          30,
-                                    ),
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 30),
 
-                                    child:
-                                        Text(
+                                    child: Text(
                                       'Nenhuma atividade cadastrada',
 
-                                      style:
-                                          TextStyle(
-                                        fontSize:
-                                            18,
+                                      style: TextStyle(
+                                        fontSize: 18,
 
-                                        color:
-                                            Colors.grey,
+                                        color: Colors.grey,
 
-                                        fontWeight:
-                                            FontWeight.w500,
+                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
                                   ),
                                 )
-
                               : Column(
-                                  children:
-                                      atividades
-                                          .map(
-                                    (
-                                      atividade,
-                                    ) {
+                                  children: atividades.map((atividade) {
+                                    return Container(
+                                      margin: const EdgeInsets.only(bottom: 15),
 
-                                      return Container(
-                                        margin:
-                                            const EdgeInsets.only(
-                                          bottom:
-                                              15,
-                                        ),
+                                      padding: const EdgeInsets.all(16),
 
-                                        padding:
-                                            const EdgeInsets.all(
-                                                16),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFF5F7FA),
 
-                                        decoration:
-                                            BoxDecoration(
-                                          color:
-                                              const Color(
-                                            0xFFF5F7FA,
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.all(12),
+
+                                            decoration: BoxDecoration(
+                                              color: Colors.blue.shade100,
+
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+
+                                            child: Icon(
+                                              atividade.categoria == 'Sono'
+                                                  ? Icons.bed
+                                                  : atividade.categoria ==
+                                                        'Alimentação'
+                                                  ? Icons.restaurant
+                                                  : atividade.categoria ==
+                                                        'Estudos'
+                                                  ? Icons.menu_book
+                                                  : atividade.categoria ==
+                                                        'Lazer'
+                                                  ? Icons.sports_esports
+                                                  : atividade.categoria ==
+                                                        'Medicação'
+                                                  ? Icons.medication
+                                                  : Icons.task,
+
+                                              color: Colors.blue,
+                                            ),
                                           ),
 
-                                          borderRadius:
-                                              BorderRadius.circular(
-                                            16,
-                                          ),
-                                        ),
+                                          const SizedBox(width: 15),
 
-                                        child:
-                                            Row(
-                                          children: [
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
 
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.all(
-                                                      12),
+                                              children: [
+                                                Text(
+                                                  atividade.nome,
 
-                                              decoration:
-                                                  BoxDecoration(
-                                                color: Colors
-                                                    .blue
-                                                    .shade100,
+                                                  style: const TextStyle(
+                                                    fontSize: 18,
 
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                  12,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
                                                 ),
-                                              ),
 
-                                              child:
-                                                  Icon(
+                                                const SizedBox(height: 5),
 
-                                                atividade.categoria ==
-                                                        'Sono'
-                                                    ? Icons.bed
+                                                Text(
+                                                  '${atividade.inicio} - ${atividade.fim}',
 
-                                                    : atividade.categoria ==
-                                                            'Alimentação'
-                                                        ? Icons.restaurant
+                                                  style: const TextStyle(
+                                                    color: Colors.grey,
 
-                                                        : atividade.categoria ==
-                                                                'Estudos'
-                                                            ? Icons.menu_book
-
-                                                            : atividade.categoria ==
-                                                                    'Lazer'
-                                                                ? Icons.sports_esports
-
-                                                                : atividade.categoria ==
-                                                                        'Medicação'
-                                                                    ? Icons.medication
-
-                                                                    : Icons.task,
-
-                                                color:
-                                                    Colors.blue,
-                                              ),
-                                            ),
-
-                                            const SizedBox(
-                                                width:
-                                                    15),
-
-                                            Expanded(
-                                              child:
-                                                  Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-
-                                                children: [
-
-                                                  Text(
-                                                    atividade.nome,
-
-                                                    style:
-                                                        const TextStyle(
-                                                      fontSize:
-                                                          18,
-
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
+                                                    fontSize: 15,
                                                   ),
-
-                                                  const SizedBox(
-                                                      height:
-                                                          5),
-
-                                                  Text(
-                                                    '${atividade.inicio} - ${atividade.fim}',
-
-                                                    style:
-                                                        const TextStyle(
-                                                      color:
-                                                          Colors.grey,
-
-                                                      fontSize:
-                                                          15,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
+                                                ),
+                                              ],
                                             ),
-                                          ],
-                                        ),
-                                      );
-                                    },
-                                  ).toList(),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }).toList(),
                                 ),
                         ],
                       ),
                     ),
 
-                    const SizedBox(
-                        height: 30),
+                    const SizedBox(height: 30),
 
                     // BOTÕES
                     Row(
                       children: [
-
                         Expanded(
-                          child:
-                              botaoHome(
-                            icone:
-                                Icons.add,
+                          child: botaoHome(
+                            icone: Icons.add,
 
-                            texto:
-                                'Nova atividade',
+                            texto: 'Nova atividade',
 
-                            onTap:
-                                () async {
-
-                              final novaAtividade =
-                                  await Navigator.push(
+                            onTap: () async {
+                              final novaAtividade = await Navigator.push(
                                 context,
 
                                 MaterialPageRoute(
-                                  builder:
-                                      (
-                                    context,
-                                  ) =>
-                                          const NovaAtividadeScreen(),
+                                  builder: (context) =>
+                                      const NovaAtividadeScreen(),
                                 ),
                               );
 
-                              if (novaAtividade !=
-                                  null) {
-
+                              if (novaAtividade != null) {
                                 setState(() {
-
-                                  AppData
-                                      .atividades
-                                      .add(
-                                    novaAtividade,
-                                  );
+                                  AppData.atividades.add(novaAtividade);
                                 });
                               }
                             },
                           ),
                         ),
 
-                        const SizedBox(
-                            width: 20),
+                        const SizedBox(width: 20),
 
                         Expanded(
-                          child:
-                              botaoHome(
-                            icone: Icons
-                                .calendar_month,
+                          child: botaoHome(
+                            icone: Icons.calendar_month,
 
-                            texto:
-                                'Rotina Semanal',
+                            texto: 'Rotina Semanal',
 
-                            onTap:
-                                () {
-
-                              ScaffoldMessenger
-                                      .of(
-                                          context)
-                                  .showSnackBar(
-
+                            onTap: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text(
                                     'Tela Rotina Semanal em desenvolvimento',
@@ -735,68 +452,46 @@ class _TelaHomeState extends State<TelaHome> {
                       ],
                     ),
 
-                    const SizedBox(
-                        height: 40),
+                    const SizedBox(height: 40),
 
                     // ATIVIDADES CONCLUÍDAS
                     const Align(
-                      alignment:
-                          Alignment.centerLeft,
+                      alignment: Alignment.centerLeft,
 
                       child: Text(
                         'Atividades concluídas',
 
-                        style:
-                            TextStyle(
+                        style: TextStyle(
                           fontSize: 28,
 
-                          fontWeight:
-                              FontWeight
-                                  .bold,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
 
-                    const SizedBox(
-                        height: 20),
+                    const SizedBox(height: 20),
 
                     Container(
-                      width:
-                          double.infinity,
+                      width: double.infinity,
 
-                      padding:
-                          const EdgeInsets
-                              .all(25),
+                      padding: const EdgeInsets.all(25),
 
-                      decoration:
-                          BoxDecoration(
-                        color:
-                            Colors.white,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
 
-                        borderRadius:
-                            BorderRadius
-                                .circular(
-                                    20),
+                        borderRadius: BorderRadius.circular(20),
                       ),
 
-                      child:
-                          const Center(
+                      child: const Center(
                         child: Text(
                           'Nenhuma atividade concluída',
 
-                          style:
-                              TextStyle(
-                            fontSize: 18,
-
-                            color:
-                                Colors.grey,
-                          ),
+                          style: TextStyle(fontSize: 18, color: Colors.grey),
                         ),
                       ),
                     ),
 
-                    const SizedBox(
-                        height: 40),
+                    const SizedBox(height: 40),
                   ],
                 ),
               ),
@@ -809,75 +504,48 @@ class _TelaHomeState extends State<TelaHome> {
 
   // BOTÃO HOME
   Widget botaoHome({
-    required IconData
-        icone,
+    required IconData icone,
 
     required String texto,
 
-    required VoidCallback
-        onTap,
+    required VoidCallback onTap,
   }) {
-
     return GestureDetector(
       onTap: onTap,
 
       child: Container(
         height: 130,
 
-        decoration:
-            BoxDecoration(
-          color:
-              Colors.white,
+        decoration: BoxDecoration(
+          color: Colors.white,
 
-          borderRadius:
-              BorderRadius
-                  .circular(
-            20,
-          ),
+          borderRadius: BorderRadius.circular(20),
 
           boxShadow: const [
-
             BoxShadow(
-              color:
-                  Colors.black12,
+              color: Colors.black12,
 
               blurRadius: 8,
 
-              offset:
-                  Offset(0, 4),
+              offset: Offset(0, 4),
             ),
           ],
         ),
 
         child: Column(
-          mainAxisAlignment:
-              MainAxisAlignment
-                  .center,
+          mainAxisAlignment: MainAxisAlignment.center,
 
           children: [
+            Icon(icone, size: 45),
 
-            Icon(
-              icone,
-              size: 45,
-            ),
-
-            const SizedBox(
-                height: 12),
+            const SizedBox(height: 12),
 
             Text(
               texto,
 
-              textAlign:
-                  TextAlign.center,
+              textAlign: TextAlign.center,
 
-              style:
-                  const TextStyle(
-                fontSize: 18,
-
-                fontWeight:
-                    FontWeight
-                        .w600,
-              ),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
           ],
         ),

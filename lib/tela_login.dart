@@ -4,50 +4,29 @@ import 'storage_service.dart';
 import 'tela_home.dart';
 
 class TelaLogin extends StatefulWidget {
-
   const TelaLogin({super.key});
 
   @override
-  State<TelaLogin> createState() =>
-      _TelaLoginState();
+  State<TelaLogin> createState() => _TelaLoginState();
 }
 
-class _TelaLoginState
-    extends State<TelaLogin> {
+class _TelaLoginState extends State<TelaLogin> {
+  final TextEditingController emailController = TextEditingController();
 
-  final TextEditingController emailController =
-      TextEditingController();
-
-  final TextEditingController senhaController =
-      TextEditingController();
+  final TextEditingController senhaController = TextEditingController();
 
   bool carregando = false;
 
   Future<void> fazerLogin() async {
-
     // LOGIN DEV
-    if (
-
-      emailController.text.trim() ==
-          'dev@kidsroutine.com' &&
-
-      senhaController.text.trim() ==
-          'dev123'
-    ) {
-
+    if (emailController.text.trim() == 'dev@kidsroutine.com' &&
+        senhaController.text.trim() == 'dev123') {
       Navigator.pushReplacement(
-
         context,
 
         MaterialPageRoute(
-
           builder: (context) =>
-              const TelaHome(
-
-            nomeCrianca: 'Kid',
-
-            idCrianca: '#0000',
-          ),
+              const TelaHome(nomeCrianca: 'Kid', idCrianca: '#0000'),
         ),
       );
 
@@ -58,56 +37,35 @@ class _TelaLoginState
       carregando = true;
     });
 
-    String email =
-        emailController.text.trim();
+    String email = emailController.text.trim();
 
-    String senha =
-        senhaController.text.trim();
+    String senha = senhaController.text.trim();
 
     // BUSCAR USUÁRIO
-    final usuario =
-        await StorageService.buscarUsuario(
-      email,
-    );
+    final usuario = await StorageService.buscarUsuario(email);
 
     // EMAIL NÃO EXISTE
     if (usuario == null) {
-
       setState(() {
         carregando = false;
       });
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-
-        const SnackBar(
-
-          content: Text(
-            'Email não encontrado',
-          ),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Email não encontrado')));
 
       return;
     }
 
     // SENHA ERRADA
     if (usuario['senha'] != senha) {
-
       setState(() {
         carregando = false;
       });
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-
-        const SnackBar(
-
-          content: Text(
-            'Senha incorreta',
-          ),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Senha incorreta')));
 
       return;
     }
@@ -118,18 +76,13 @@ class _TelaLoginState
     });
 
     Navigator.pushReplacement(
-
       context,
 
       MaterialPageRoute(
-
         builder: (context) => TelaHome(
+          nomeCrianca: usuario['crianca'],
 
-          nomeCrianca:
-              usuario['crianca'],
-
-          idCrianca:
-              usuario['idCrianca'],
+          idCrianca: usuario['idCrianca'],
         ),
       ),
     );
@@ -137,48 +90,26 @@ class _TelaLoginState
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-
-      backgroundColor:
-          const Color(0xFFF5F5F5),
+      backgroundColor: const Color(0xFFF5F5F5),
 
       body: SafeArea(
-
         child: SingleChildScrollView(
-
-          padding:
-              const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(24),
 
           child: Column(
-
             children: [
-
               const SizedBox(height: 20),
 
               // LOGO
               Align(
-
                 alignment: Alignment.topRight,
-
-                child: Container(
-
-                  width: 65,
-                  height: 65,
-
-                  decoration:
-                      const BoxDecoration(
-
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                  ),
-
-                  child: ClipOval(
-
-                    child: Image.asset(
-                      'assets/images/logo.png',
-                      fit: BoxFit.cover,
-                    ),
+                child: SizedBox(
+                  width: 80, // Tamanho ajustado para melhor visibilidade
+                  height: 80,
+                  child: Image.asset(
+                    'assets/images/logo.png',
+                    fit: BoxFit.contain,
                   ),
                 ),
               ),
@@ -186,42 +117,27 @@ class _TelaLoginState
               const SizedBox(height: 30),
 
               // IMAGEM
-              Image.asset(
-                'assets/images/family.png',
-                height: 250,
-              ),
+              Image.asset('assets/images/family.png', height: 250),
 
               const SizedBox(height: 30),
 
               // TÍTULO
               const Text(
-
                 'Login',
 
-                style: TextStyle(
-                  fontSize: 36,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
               ),
 
               const SizedBox(height: 40),
 
               // EMAIL
-              campoTexto(
-
-                controller:
-                    emailController,
-
-                texto: 'Email',
-              ),
+              campoTexto(controller: emailController, texto: 'Email'),
 
               const SizedBox(height: 20),
 
               // SENHA
               campoTexto(
-
-                controller:
-                    senhaController,
+                controller: senhaController,
 
                 texto: 'Senha',
 
@@ -232,23 +148,14 @@ class _TelaLoginState
 
               // ESQUECI SENHA
               Align(
-
-                alignment:
-                    Alignment.centerRight,
+                alignment: Alignment.centerRight,
 
                 child: TextButton(
-
                   onPressed: () {
-
-                    Navigator.pushNamed(
-                      context,
-                      '/recuperar-senha',
-                    );
+                    Navigator.pushNamed(context, '/recuperar-senha');
                   },
 
-                  child: const Text(
-                    'Esqueci minha senha',
-                  ),
+                  child: const Text('Esqueci minha senha'),
                 ),
               ),
 
@@ -256,51 +163,31 @@ class _TelaLoginState
 
               // BOTÃO LOGIN
               SizedBox(
-
                 width: double.infinity,
                 height: 60,
 
                 child: ElevatedButton(
+                  onPressed: carregando ? null : fazerLogin,
 
-                  onPressed:
-                      carregando
-                          ? null
-                          : fazerLogin,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF4E8FE8),
 
-                  style:
-                      ElevatedButton.styleFrom(
-
-                    backgroundColor:
-                        const Color(
-                            0xFF4E8FE8),
-
-                    shape:
-                        RoundedRectangleBorder(
-
-                      borderRadius:
-                          BorderRadius.circular(
-                              16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
                     ),
                   ),
 
-                  child:
-                      carregando
-                          ? const CircularProgressIndicator(
-                              color:
-                                  Colors.white,
-                            )
-                          : const Text(
+                  child: carregando
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text(
+                          'ENTRAR',
 
-                              'ENTRAR',
-
-                              style: TextStyle(
-                                fontSize: 22,
-                                color:
-                                    Colors.white,
-                                fontWeight:
-                                    FontWeight.bold,
-                              ),
-                            ),
+                          style: TextStyle(
+                            fontSize: 22,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
               ),
 
@@ -308,22 +195,14 @@ class _TelaLoginState
 
               // CRIAR CONTA
               TextButton(
-
                 onPressed: () {
-
-                  Navigator.pushNamed(
-                    context,
-                    '/cadastro',
-                  );
+                  Navigator.pushNamed(context, '/cadastro');
                 },
 
                 child: const Text(
-
                   'Criar nova conta',
 
-                  style: TextStyle(
-                    fontSize: 16,
-                  ),
+                  style: TextStyle(fontSize: 16),
                 ),
               ),
             ],
@@ -335,22 +214,18 @@ class _TelaLoginState
 
   // CAMPO PERSONALIZADO
   Widget campoTexto({
-
     required TextEditingController controller,
 
     required String texto,
 
     bool senha = false,
   }) {
-
     return TextField(
-
       controller: controller,
 
       obscureText: senha,
 
       decoration: InputDecoration(
-
         hintText: texto,
 
         filled: true,
@@ -358,9 +233,7 @@ class _TelaLoginState
         fillColor: Colors.white,
 
         border: OutlineInputBorder(
-
-          borderRadius:
-              BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(16),
 
           borderSide: BorderSide.none,
         ),

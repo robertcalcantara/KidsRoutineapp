@@ -8,9 +8,7 @@ class TelaConfiguracoes extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F4F4),
-      bottomNavigationBar: const Navbar(
-  currentIndex: 3,
-),
+      bottomNavigationBar: const Navbar(currentIndex: 3),
 
       body: SafeArea(
         child: Padding(
@@ -34,19 +32,13 @@ class TelaConfiguracoes extends StatelessWidget {
                     ),
                   ),
 
-                  Container(
-                    width: 55,
-                    height: 55,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(100),
-                      child: Image.asset(
-                        'assets/images/logo.png',
-                        fit: BoxFit.cover,
-                      ),
+                  // LOGO (Linhas 37 a 51)
+                  SizedBox(
+                    width: 70,
+                    height: 70,
+                    child: Image.asset(
+                      'assets/images/logo.png',
+                      fit: BoxFit.contain,
                     ),
                   ),
                 ],
@@ -78,9 +70,7 @@ class TelaConfiguracoes extends StatelessWidget {
                 texto: 'Notificações',
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Abrir Notificações'),
-                    ),
+                    const SnackBar(content: Text('Abrir Notificações')),
                   );
                 },
               ),
@@ -96,9 +86,7 @@ class TelaConfiguracoes extends StatelessWidget {
                 texto: 'Ajuda e Suporte',
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Abrir Ajuda e Suporte'),
-                    ),
+                    const SnackBar(content: Text('Abrir Ajuda e Suporte')),
                   );
                 },
               ),
@@ -120,10 +108,7 @@ class TelaConfiguracoes extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: const Color(0xFFFFB3B3),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: Colors.red,
-                      width: 1,
-                    ),
+                    border: Border.all(color: Colors.red, width: 1),
                   ),
                   child: const Center(
                     child: Text(
@@ -147,11 +132,7 @@ class TelaConfiguracoes extends StatelessWidget {
   }
 
   Widget _linha() {
-    return Container(
-      width: double.infinity,
-      height: 1,
-      color: Colors.black54,
-    );
+    return Container(width: double.infinity, height: 1, color: Colors.black54);
   }
 
   Widget _itemConfiguracao({
@@ -163,11 +144,7 @@ class TelaConfiguracoes extends StatelessWidget {
       onTap: onTap,
       child: Row(
         children: [
-          Icon(
-            icon,
-            size: 38,
-            color: Colors.black,
-          ),
+          Icon(icon, size: 38, color: Colors.black),
 
           const SizedBox(width: 18),
 
@@ -182,11 +159,7 @@ class TelaConfiguracoes extends StatelessWidget {
             ),
           ),
 
-          const Icon(
-            Icons.chevron_right,
-            size: 36,
-            color: Colors.black,
-          ),
+          const Icon(Icons.chevron_right, size: 36, color: Colors.black),
         ],
       ),
     );

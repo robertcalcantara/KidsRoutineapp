@@ -18,9 +18,7 @@ class _TelaHistoricoState extends State<TelaHistorico> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F4F4),
-      bottomNavigationBar: const Navbar(
-  currentIndex: 2,
-),
+      bottomNavigationBar: const Navbar(currentIndex: 2),
 
       body: SafeArea(
         child: Padding(
@@ -44,19 +42,13 @@ class _TelaHistoricoState extends State<TelaHistorico> {
                     ),
                   ),
 
-                  Container(
-                    width: 58,
-                    height: 58,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(100),
-                      child: Image.asset(
-                        'assets/images/logo.png',
-                        fit: BoxFit.cover,
-                      ),
+                  // LOGO (Linhas 47 a 61)
+                  SizedBox(
+                    width: 70, // Ajustado para caber bem no Row
+                    height: 70,
+                    child: Image.asset(
+                      'assets/images/logo.png',
+                      fit: BoxFit.contain,
                     ),
                   ),
                 ],
@@ -67,13 +59,7 @@ class _TelaHistoricoState extends State<TelaHistorico> {
               // BOTÕES
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _botaoHoje(),
-
-                  _botaoSemana(),
-
-                  _botaoMes(),
-                ],
+                children: [_botaoHoje(), _botaoSemana(), _botaoMes()],
               ),
 
               const SizedBox(height: 20),
@@ -85,8 +71,8 @@ class _TelaHistoricoState extends State<TelaHistorico> {
                   filtroSelecionado == 'Hoje'
                       ? 'Exibindo: Hoje'
                       : filtroSelecionado == 'Semana'
-                          ? 'Exibindo: $semanaSelecionada'
-                          : 'Exibindo: $mesSelecionado',
+                      ? 'Exibindo: $semanaSelecionada'
+                      : 'Exibindo: $mesSelecionado',
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -160,9 +146,7 @@ class _TelaHistoricoState extends State<TelaHistorico> {
           child: Text(
             'Hoje',
             style: TextStyle(
-              color: filtroSelecionado == 'Hoje'
-                  ? Colors.white
-                  : Colors.black,
+              color: filtroSelecionado == 'Hoje' ? Colors.white : Colors.black,
               fontSize: 28,
               fontWeight: FontWeight.w900,
             ),
@@ -267,9 +251,7 @@ class _TelaHistoricoState extends State<TelaHistorico> {
           child: Text(
             'Mês',
             style: TextStyle(
-              color: filtroSelecionado == 'Mês'
-                  ? Colors.white
-                  : Colors.black,
+              color: filtroSelecionado == 'Mês' ? Colors.white : Colors.black,
               fontSize: 24,
               fontWeight: FontWeight.w900,
             ),
@@ -314,16 +296,11 @@ class CardHistorico extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 18,
-        vertical: 18,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color(0xFFD9D9D9),
-        ),
+        border: Border.all(color: const Color(0xFFD9D9D9)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
