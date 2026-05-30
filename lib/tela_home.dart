@@ -5,6 +5,7 @@ import 'widgets/navbar.dart';
 import 'Tela_perfil.dart';
 import 'atividade.dart';
 import 'tela_nova_atividade.dart';
+import 'tela_rotina.dart';
 import 'app_data.dart';
 
 class TelaHome extends StatefulWidget {
@@ -39,6 +40,43 @@ class _TelaHomeState extends State<TelaHome> {
   Uint8List? get fotoPerfil => AppData.fotoPerfil;
 
   List<Atividade> get atividades => AppData.atividades;
+
+  List<Atividade> get atividadesHoje => atividades.where((atividade) {
+        final hoje = DateTime.now();
+        return atividade.data.day == hoje.day &&
+            atividade.data.month == hoje.month &&
+            atividade.data.year == hoje.year;
+      }).toList();
+
+  List<Atividade> get ultimasConcluidas {
+    final lista = atividades.where((atividade) => atividade.concluida).toList();
+
+    lista.sort((a, b) {
+      final dataA = a.concluidaEm ?? a.data;
+      final dataB = b.concluidaEm ?? b.data;
+      return dataB.compareTo(dataA);
+    });
+
+    return lista.take(3).toList();
+  }
+
+  String _formatarData(DateTime data) {
+    return '${data.day.toString().padLeft(2, '0')}/${data.month.toString().padLeft(2, '0')}/${data.year}';
+  }
+
+  IconData _iconeCategoria(String categoria) {
+    return categoria == 'Sono'
+        ? Icons.bed
+        : categoria == 'Alimentação'
+            ? Icons.restaurant
+            : categoria == 'Estudos'
+                ? Icons.menu_book
+                : categoria == 'Lazer'
+                    ? Icons.sports_esports
+                    : categoria == 'Medicação'
+                        ? Icons.medication
+                        : Icons.task;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -295,7 +333,7 @@ class _TelaHomeState extends State<TelaHome> {
 
                           const SizedBox(height: 20),
 
-                          atividades.isEmpty
+                          atividadesHoje.isEmpty
                               ? const Center(
                                   child: Padding(
                                     padding: EdgeInsets.symmetric(vertical: 30),
@@ -314,7 +352,7 @@ class _TelaHomeState extends State<TelaHome> {
                                   ),
                                 )
                               : Column(
-                                  children: atividades.map((atividade) {
+                                  children: atividadesHoje.map((atividade) {
                                     return Container(
                                       margin: const EdgeInsets.only(bottom: 15),
 
@@ -339,22 +377,7 @@ class _TelaHomeState extends State<TelaHome> {
                                             ),
 
                                             child: Icon(
-                                              atividade.categoria == 'Sono'
-                                                  ? Icons.bed
-                                                  : atividade.categoria ==
-                                                        'Alimentação'
-                                                  ? Icons.restaurant
-                                                  : atividade.categoria ==
-                                                        'Estudos'
-                                                  ? Icons.menu_book
-                                                  : atividade.categoria ==
-                                                        'Lazer'
-                                                  ? Icons.sports_esports
-                                                  : atividade.categoria ==
-                                                        'Medicação'
-                                                  ? Icons.medication
-                                                  : Icons.task,
-
+                                              _iconeCategoria(atividade.categoria),
                                               color: Colors.blue,
                                             ),
                                           ),
@@ -388,8 +411,32 @@ class _TelaHomeState extends State<TelaHome> {
                                                     fontSize: 15,
                                                   ),
                                                 ),
+
+                                                const SizedBox(height: 4),
+
+                                                Text(
+                                                  _formatarData(atividade.data),
+
+                                                  style: const TextStyle(
+                                                    color: Colors.grey,
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
                                               ],
                                             ),
+                                          ),
+
+                                          Checkbox(
+                                            value: atividade.concluida,
+                                            activeColor: Colors.green,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                atividade.concluida = value!;
+                                                atividade.concluidaEm = value
+                                                    ? DateTime.now()
+                                                    : null;
+                                              });
+                                            },
                                           ),
                                         ],
                                       ),
@@ -439,13 +486,14 @@ class _TelaHomeState extends State<TelaHome> {
                             texto: 'Rotina Semanal',
 
                             onTap: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Tela Rotina Semanal em desenvolvimento',
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const TelaRotina(
+                                    filtroInicial: 'Semana',
                                   ),
                                 ),
-                              );
+                              ).then((_) => setState(() {}));
                             },
                           ),
                         ),
@@ -482,13 +530,58 @@ class _TelaHomeState extends State<TelaHome> {
                         borderRadius: BorderRadius.circular(20),
                       ),
 
-                      child: const Center(
-                        child: Text(
-                          'Nenhuma atividade concluída',
+                      child: ultimasConcluidas.isEmpty
+                          ? const Center(
+                              child: Text(
+                                'Nenhuma atividade concluída',
 
-                          style: TextStyle(fontSize: 18, color: Colors.grey),
-                        ),
-                      ),
+                                style: TextStyle(fontSize: 18, color: Colors.grey),
+                              ),
+                            )
+                          : Column(
+                              children: ultimasConcluidas.map((atividade) {
+                                return Container(
+                                  margin: const EdgeInsets.only(bottom: 12),
+                                  padding: const EdgeInsets.all(14),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFF5F7FA),
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        _iconeCategoria(atividade.categoria),
+                                        color: Colors.green,
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              atividade.nome,
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              '${atividade.inicio} - ${atividade.fim} • ${_formatarData(atividade.data)}',
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const Icon(Icons.check_circle, color: Colors.green),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                            ),
                     ),
 
                     const SizedBox(height: 40),
