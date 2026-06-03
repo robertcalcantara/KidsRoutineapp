@@ -19,43 +19,26 @@ class KidsRoutineApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-
       title: 'Kids Routine',
-
       theme: ThemeData(
         primarySwatch: Colors.blue,
-
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF1565C0)),
-
         useMaterial3: true,
       ),
-
       initialRoute: '/',
-
       routes: {
-        // LOGIN
         '/': (context) => const TelaLogin(),
-
-        // CADASTRO
         '/cadastro': (context) => const TelaCadastro(),
-
-        // RECUPERAR SENHA
         '/recuperar-senha': (context) => const TelaRecuperarSenha(),
-
-        // HOME
         '/home': (context) =>
             const TelaHome(nomeCrianca: 'Perfil Teste', idCrianca: '#0000'),
-
-        // HISTÓRICO
         '/historico': (context) => const TelaHistorico(),
-
-        // CONFIGURAÇÕES
         '/configuracoes': (context) => const TelaConfiguracoes(),
-
-        // NOVA ATIVIDADE
         '/nova-atividade': (context) => const NovaAtividadeScreen(),
-
-        '/rotina': (context) => const TelaRotina(),
+        '/rotina': (context) {
+          final filtro = ModalRoute.of(context)?.settings.arguments as String?;
+          return TelaRotina(filtroInicial: filtro ?? 'Hoje');
+        },
       },
     );
   }
