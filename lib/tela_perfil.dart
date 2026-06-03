@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-// IMPORTANTE: Adicione a importação do arquivo da Ficha Médica aqui. 
-// Ajuste o caminho conforme a estrutura de pastas do seu grupo:
-import 'ficha_medica_screen.dart'; 
+import 'ficha_medica_screen.dart';
 
 class TelaPerfil extends StatefulWidget {
   final String nome;
-  final String idade;
+  final DateTime dataNascimento; // Mudou de String para DateTime
   final String genero;
+  final String school; // Mantido de acordo com seu código original (escola)
   final String escola;
   final String emergencia;
   final String observacoes;
@@ -17,12 +16,13 @@ class TelaPerfil extends StatefulWidget {
   const TelaPerfil({
     super.key,
     required this.nome,
-    required this.idade,
+    required this.dataNascimento, // Atualizado aqui
     required this.genero,
     required this.escola,
     required this.emergencia,
     required this.observacoes,
     required this.foto,
+    this.school = "",
   });
 
   @override
@@ -39,11 +39,13 @@ class _TelaPerfilState extends State<TelaPerfil> {
   Uint8List? _imageBytes;
   final ImagePicker _picker = ImagePicker();
 
+  // DATA DE NASCIMENTO
+  late DateTime _dataNascimentoSelecionada;
+
   Future<void> _pickImage() async {
     if (!isEditing) return;
 
-    final XFile? image =
-        await _picker.pickImage(source: ImageSource.gallery);
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
 
     if (image != null) {
       final bytes = await image.readAsBytes();
@@ -55,35 +57,22 @@ class _TelaPerfilState extends State<TelaPerfil> {
   }
 
   // CONTROLLERS
-  final TextEditingController nomeController =
-      TextEditingController(text: "Kid");
+  final TextEditingController nomeController = TextEditingController();
+  final TextEditingController escolaController = TextEditingController();
+  final TextEditingController emergenciaController = TextEditingController();
+  final TextEditingController observacoesController = TextEditingController();
 
-  final TextEditingController idadeNumeroController =
-      TextEditingController(text: "3");
-
-  String unidadeIdade = "anos";
-
-  final TextEditingController escolaController =
-      TextEditingController(text: "Escola UNIT");
-
-  final TextEditingController emergenciaController =
-      TextEditingController(text: "Mãe (79) 98888-7777");
-
-  final TextEditingController observacoesController =
-      TextEditingController(text: "ALÉRGICA A Farofa");
-      
   @override
   void initState() {
     super.initState();
 
     genero = widget.genero;
+    _dataNascimentoSelecionada = widget.dataNascimento;
 
     nomeController.text = widget.nome;
-    idadeNumeroController.text = widget.idade;
     escolaController.text = widget.escola;
     emergenciaController.text = widget.emergencia;
-    observacoesController.text =
-        widget.observacoes;
+    observacoesController.text = widget.observacoes;
 
     _imageBytes = widget.foto;
   }
@@ -91,22 +80,66 @@ class _TelaPerfilState extends State<TelaPerfil> {
   @override
   void dispose() {
     nomeController.dispose();
-    idadeNumeroController.dispose();
     escolaController.dispose();
     emergenciaController.dispose();
     observacoesController.dispose();
     super.dispose();
   }
 
+  // FUNÇÃO PARA CALCULAR A IDADE DINAMICAMENTE
+  String _calcularIdadeString(DateTime dataNasc) {
+    final hoje = DateTime.now();
+    int anos = hoje.year - dataNasc.year;
+    int meses = hoje.month - dataNasc.month;
+
+    if (hoje.day < dataNasc.day) {
+      meses--;
+    }
+
+    if (meses < 0) {
+      anos--;
+      meses += 12;
+    }
+
+    if (anos > 0) {
+      return "$anos ${anos == 1 ? 'ano' : 'anos'}";
+    } else {
+      return "$meses ${meses == 1 ? 'mês' : 'meses'}";
+    }
+  }
+
+  // FUNÇÃO PARA FORMATAR A DATA NO PADRÃO PT-BR (DD/MM/AAAA)
+  String _formatarData(DateTime data) {
+    return "${data.day.toString().padLeft(2, '0')}/${data.month.toString().padLeft(2, '0')}/${data.year}";
+  }
+
+  // SELETOR DE DATA (DATE PICKER)
+  Future<void> _selecionarData(BuildContext context) async {
+    final DateTime? selecionada = await showDatePicker(
+      context: context,
+      initialDate: _dataNascimentoSelecionada,
+      firstDate: DateTime(DateTime.now().year - 18), // Limite de 18 anos atrás
+      lastDate: DateTime.now(), // Não deixa selecionar data futura
+      locale: const Locale(
+        'pt',
+        'BR',
+      ), // Lembre-se de configurar a localização no main.dart se necessário
+    );
+
+    if (selecionada != null && selecionada != _dataNascimentoSelecionada) {
+      setState(() {
+        _dataNascimentoSelecionada = selecionada;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    Color corGenero =
-        genero == "masculino" ? Colors.blue : Colors.pink;
+    Color corGenero = genero == "masculino" ? Colors.blue : Colors.pink;
 
-    Color corFundoIcone =
-        genero == "masculino"
-            ? Colors.blue[50]!
-            : Colors.pink[50]!;
+    Color corFundoIcone = genero == "masculino"
+        ? Colors.blue[50]!
+        : Colors.pink[50]!;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -114,15 +147,10 @@ class _TelaPerfilState extends State<TelaPerfil> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Colors.black,
-          ),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-
         title: const Text(
           "Perfil da Criança",
           style: TextStyle(
@@ -131,19 +159,14 @@ class _TelaPerfilState extends State<TelaPerfil> {
             fontSize: 22,
           ),
         ),
-
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
-
             child: CircleAvatar(
               backgroundColor: corFundoIcone,
               radius: 20,
-
               child: Icon(
-                genero == "masculino"
-                    ? Icons.face
-                    : Icons.face_3,
+                genero == "masculino" ? Icons.face : Icons.face_3,
                 color: corGenero,
                 size: 24,
               ),
@@ -154,9 +177,7 @@ class _TelaPerfilState extends State<TelaPerfil> {
 
       body: SingleChildScrollView(
         child: Padding(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 24.0),
-
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -168,33 +189,27 @@ class _TelaPerfilState extends State<TelaPerfil> {
                   children: [
                     GestureDetector(
                       onTap: _pickImage,
-
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
                           Container(
                             width: 120,
                             height: 120,
-
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: Colors.grey[200],
-
                               border: Border.all(
                                 color: isEditing
                                     ? corGenero
                                     : Colors.transparent,
                                 width: 3,
                               ),
-
                               image: _imageBytes != null
                                   ? DecorationImage(
-                                      image: MemoryImage(
-                                          _imageBytes!),
+                                      image: MemoryImage(_imageBytes!),
                                       fit: BoxFit.cover,
                                     )
                                   : null,
-
                               boxShadow: const [
                                 BoxShadow(
                                   color: Colors.black12,
@@ -203,28 +218,23 @@ class _TelaPerfilState extends State<TelaPerfil> {
                                 ),
                               ],
                             ),
-
                             child: _imageBytes == null
                                 ? ClipOval(
                                     child: Icon(
                                       Icons.person,
                                       size: 80,
-                                      color:
-                                          Colors.grey[400],
+                                      color: Colors.grey[400],
                                     ),
                                   )
                                 : null,
                           ),
-
                           if (isEditing)
                             Positioned(
                               bottom: 0,
                               right: 0,
-
                               child: CircleAvatar(
                                 backgroundColor: corGenero,
                                 radius: 18,
-
                                 child: const Icon(
                                   Icons.camera_alt,
                                   color: Colors.white,
@@ -238,17 +248,14 @@ class _TelaPerfilState extends State<TelaPerfil> {
 
                     const SizedBox(height: 16),
 
-                    _buildMainField(
-                      nomeController,
-                      isTitle: true,
-                    ),
+                    _buildMainField(nomeController, isTitle: true),
 
                     const SizedBox(height: 8),
 
+                    // CAMPO DE IDADE CORRIGIDO
                     _buildIdadeField(),
 
-                    if (isEditing)
-                      _buildGeneroSelector(corGenero),
+                    if (isEditing) _buildGeneroSelector(corGenero),
                   ],
                 ),
               ),
@@ -263,22 +270,14 @@ class _TelaPerfilState extends State<TelaPerfil> {
                   color: Colors.grey,
                 ),
               ),
-
               const Divider(),
-
               const SizedBox(height: 10),
 
-              _buildEditableRow(
-                "Escola:",
-                escolaController,
-              ),
+              _buildEditableRow("Escola:", escolaController),
 
               const SizedBox(height: 15),
 
-              _buildEditableRow(
-                "Emergência:",
-                emergenciaController,
-              ),
+              _buildEditableRow("Emergência:", emergenciaController),
 
               const SizedBox(height: 30),
 
@@ -289,9 +288,7 @@ class _TelaPerfilState extends State<TelaPerfil> {
                     color: Colors.red,
                     size: 20,
                   ),
-
                   SizedBox(width: 8),
-
                   Text(
                     "ALERTA DE SAÚDE",
                     style: TextStyle(
@@ -304,9 +301,7 @@ class _TelaPerfilState extends State<TelaPerfil> {
               ),
 
               const SizedBox(height: 10),
-
               _buildAlertaSaude(),
-
               const SizedBox(height: 40),
 
               // BOTÃO SALVAR
@@ -315,23 +310,21 @@ class _TelaPerfilState extends State<TelaPerfil> {
                   backgroundColor: isEditing
                       ? Colors.green
                       : const Color(0xFF5A8DEE),
-
-                  minimumSize:
-                      const Size(double.infinity, 55),
-
+                  minimumSize: const Size(double.infinity, 55),
                   shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-
                   elevation: 0,
                 ),
-
                 onPressed: () {
                   if (isEditing) {
                     Navigator.pop(context, {
                       'nome': nomeController.text,
-                      'idade': idadeNumeroController.text,
+                      'dataNascimento':
+                          _dataNascimentoSelecionada, // Retorna o DateTime alterado
+                      'idade': _calcularIdadeString(
+                        _dataNascimentoSelecionada,
+                      ), // Caso precise da String em algum lugar
                       'genero': genero,
                       'escola': escolaController.text,
                       'emergencia': emergenciaController.text,
@@ -344,12 +337,8 @@ class _TelaPerfilState extends State<TelaPerfil> {
                     });
                   }
                 },
-
                 child: Text(
-                  isEditing
-                      ? "Salvar Alterações"
-                      : "Editar Perfil",
-
+                  isEditing ? "Salvar Alterações" : "Editar Perfil",
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 18,
@@ -359,9 +348,7 @@ class _TelaPerfilState extends State<TelaPerfil> {
               ),
 
               const SizedBox(height: 16),
-
               _buildSecondaryButtons(),
-
               const SizedBox(height: 40),
             ],
           ),
@@ -374,35 +361,24 @@ class _TelaPerfilState extends State<TelaPerfil> {
   Widget _buildGeneroSelector(Color corAtiva) {
     return Padding(
       padding: const EdgeInsets.only(top: 15),
-
       child: Row(
-        mainAxisAlignment:
-            MainAxisAlignment.center,
-
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           ChoiceChip(
             label: const Text("Menino"),
-
             selected: genero == "masculino",
-
             selectedColor: Colors.blue[100],
-
             onSelected: (val) {
               setState(() {
                 genero = "masculino";
               });
             },
           ),
-
           const SizedBox(width: 10),
-
           ChoiceChip(
             label: const Text("Menina"),
-
             selected: genero == "feminino",
-
             selectedColor: Colors.pink[100],
-
             onSelected: (val) {
               setState(() {
                 genero = "feminino";
@@ -414,90 +390,42 @@ class _TelaPerfilState extends State<TelaPerfil> {
     );
   }
 
-  // IDADE
+  // NOVO WIDGET DE IDADE / DATA DE NASCIMENTO
   Widget _buildIdadeField() {
     if (!isEditing) {
+      // Exibe a idade calculada dinamicamente quando não está editando
       return Text(
-        "${idadeNumeroController.text} $unidadeIdade",
-
-        style: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-        ),
+        _calcularIdadeString(_dataNascimentoSelecionada),
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
       );
     }
 
-    return Row(
-      mainAxisAlignment:
-          MainAxisAlignment.center,
-
-      children: [
-        SizedBox(
-          width: 70,
-
-          child: TextField(
-            controller: idadeNumeroController,
-
-            keyboardType: TextInputType.number,
-
-            inputFormatters: [
-              FilteringTextInputFormatter
-                  .digitsOnly
-            ],
-
-            textAlign: TextAlign.center,
-
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Colors.grey[200],
-
-              border: OutlineInputBorder(
-                borderRadius:
-                    BorderRadius.circular(8),
-                borderSide: BorderSide.none,
+    // Botão estilizado para abrir o DatePicker em modo de edição
+    return InkWell(
+      onTap: () => _selecionarData(context),
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.calendar_month, size: 20, color: Colors.black54),
+            const SizedBox(width: 8),
+            Text(
+              "${_formatarData(_dataNascimentoSelecionada)} (${_calcularIdadeString(_dataNascimentoSelecionada)})",
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
               ),
-
-              isDense: true,
             ),
-          ),
+          ],
         ),
-
-        const SizedBox(width: 10),
-
-        Container(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 12),
-
-          decoration: BoxDecoration(
-            color: Colors.grey[200],
-            borderRadius: BorderRadius.circular(8),
-          ),
-
-          child: DropdownButton<String>(
-            value: unidadeIdade,
-
-            underline: const SizedBox(),
-
-            items: const [
-              DropdownMenuItem(
-                value: "anos",
-                child: Text("anos"),
-              ),
-
-              DropdownMenuItem(
-                value: "meses",
-                child: Text("meses"),
-              ),
-            ],
-
-            onChanged: (val) {
-              setState(() {
-                unidadeIdade = val!;
-              });
-            },
-          ),
-        ),
-      ],
+      ),
     );
   }
 
@@ -509,32 +437,23 @@ class _TelaPerfilState extends State<TelaPerfil> {
     if (!isEditing) {
       return Text(
         controller.text,
-
         style: TextStyle(
           fontSize: isTitle ? 26 : 16,
-          fontWeight:
-              isTitle
-                  ? FontWeight.w900
-                  : FontWeight.bold,
+          fontWeight: isTitle ? FontWeight.w900 : FontWeight.bold,
         ),
       );
     }
 
     return SizedBox(
       width: 200,
-
       child: TextField(
         controller: controller,
-
         textAlign: TextAlign.center,
-
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.grey[200],
-
           border: OutlineInputBorder(
-            borderRadius:
-                BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(8),
             borderSide: BorderSide.none,
           ),
         ),
@@ -543,49 +462,31 @@ class _TelaPerfilState extends State<TelaPerfil> {
   }
 
   // LINHAS EDITÁVEIS
-  Widget _buildEditableRow(
-    String label,
-    TextEditingController controller,
-  ) {
+  Widget _buildEditableRow(String label, TextEditingController controller) {
     return Row(
       children: [
         SizedBox(
           width: 100,
-
           child: Text(
             label,
-
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ),
-
         Expanded(
           child: isEditing
               ? TextField(
                   controller: controller,
-
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Colors.grey[200],
-
                     border: OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(8),
                       borderSide: BorderSide.none,
                     ),
-
                     isDense: true,
                   ),
                 )
-              : Text(
-                  controller.text,
-
-                  style:
-                      const TextStyle(fontSize: 16),
-                ),
+              : Text(controller.text, style: const TextStyle(fontSize: 16)),
         ),
       ],
     );
@@ -595,47 +496,29 @@ class _TelaPerfilState extends State<TelaPerfil> {
   Widget _buildAlertaSaude() {
     return Container(
       width: double.infinity,
-
-      padding:
-          isEditing
-              ? EdgeInsets.zero
-              : const EdgeInsets.all(16),
-
+      padding: isEditing ? EdgeInsets.zero : const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color:
-            isEditing
-                ? Colors.transparent
-                : Colors.red[50],
-
+        color: isEditing ? Colors.transparent : Colors.red[50],
         borderRadius: BorderRadius.circular(12),
-
         border: isEditing
             ? null
-            : Border.all(
-                color:
-                    Colors.red.withOpacity(0.3),
-              ),
+            : Border.all(color: Colors.red.withOpacity(0.3)),
       ),
-
       child: isEditing
           ? TextField(
               controller: observacoesController,
               maxLines: null,
-
               decoration: InputDecoration(
                 filled: true,
                 fillColor: Colors.grey[200],
-
                 border: OutlineInputBorder(
-                  borderRadius:
-                      BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
                 ),
               ),
             )
           : Text(
               observacoesController.text,
-
               style: const TextStyle(
                 color: Colors.red,
                 fontSize: 16,
@@ -651,36 +534,28 @@ class _TelaPerfilState extends State<TelaPerfil> {
       children: [
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor:
-                const Color(0xFF1976D2),
-
-            minimumSize:
-                const Size(double.infinity, 55),
-
+            backgroundColor: const Color(0xFF1976D2),
+            minimumSize: const Size(double.infinity, 55),
             shape: RoundedRectangleBorder(
-              borderRadius:
-                  BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(12),
             ),
           ),
-
-          // AQUI FIZEMOS A CONEXÃO ENTRE AS TELAS:
           onPressed: () {
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => FichaMedicaScreen(
-                  // Pega o nome digitado no controlador e envia pra Ficha Médica
-                  nome: nomeController.text.isEmpty ? 'Criança' : nomeController.text,
-                  // Junta o número da idade com a unidade (ex: "5" + " " + "anos")
-                  idade: "${idadeNumeroController.text} $unidadeIdade",
+                  nome: nomeController.text.isEmpty
+                      ? 'Criança'
+                      : nomeController.text,
+                  // Agora passa a idade calculada dinamicamente para a Ficha Médica!
+                  idade: _calcularIdadeString(_dataNascimentoSelecionada),
                 ),
               ),
             );
           },
-
           child: const Text(
             "Ver Ficha Médica Completa",
-
             style: TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -688,28 +563,18 @@ class _TelaPerfilState extends State<TelaPerfil> {
             ),
           ),
         ),
-
         const SizedBox(height: 16),
-
         OutlinedButton(
           style: OutlinedButton.styleFrom(
-            side:
-                const BorderSide(color: Colors.black38),
-
-            minimumSize:
-                const Size(double.infinity, 55),
-
+            side: const BorderSide(color: Colors.black38),
+            minimumSize: const Size(double.infinity, 55),
             shape: RoundedRectangleBorder(
-              borderRadius:
-                  BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(12),
             ),
           ),
-
           onPressed: () {},
-
           child: const Text(
             "Excluir Criança",
-
             style: TextStyle(
               color: Colors.black54,
               fontSize: 18,

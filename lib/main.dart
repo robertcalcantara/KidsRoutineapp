@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'tela_login.dart';
 import 'tela_cadastro.dart';
 import 'tela_recuperar_senha.dart';
@@ -19,19 +20,22 @@ class KidsRoutineApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-
       title: 'Kids Routine',
-
       theme: ThemeData(
         primarySwatch: Colors.blue,
-
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF1565C0)),
-
         useMaterial3: true,
       ),
 
-      initialRoute: '/',
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('pt', 'BR')],
+      locale: const Locale('pt', 'BR'),
 
+      initialRoute: '/',
       routes: {
         // LOGIN
         '/': (context) => const TelaLogin(),
