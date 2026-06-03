@@ -5,9 +5,9 @@ import 'ficha_medica_screen.dart';
 
 class TelaPerfil extends StatefulWidget {
   final String nome;
-  final DateTime dataNascimento; // Mudou de String para DateTime
+  final DateTime dataNascimento;
   final String genero;
-  final String school; // Mantido de acordo com seu código original (escola)
+  final String school;
   final String escola;
   final String emergencia;
   final String observacoes;
@@ -16,7 +16,7 @@ class TelaPerfil extends StatefulWidget {
   const TelaPerfil({
     super.key,
     required this.nome,
-    required this.dataNascimento, // Atualizado aqui
+    required this.dataNascimento,
     required this.genero,
     required this.escola,
     required this.emergencia,
@@ -118,12 +118,9 @@ class _TelaPerfilState extends State<TelaPerfil> {
     final DateTime? selecionada = await showDatePicker(
       context: context,
       initialDate: _dataNascimentoSelecionada,
-      firstDate: DateTime(DateTime.now().year - 18), // Limite de 18 anos atrás
-      lastDate: DateTime.now(), // Não deixa selecionar data futura
-      locale: const Locale(
-        'pt',
-        'BR',
-      ), // Lembre-se de configurar a localização no main.dart se necessário
+      firstDate: DateTime(DateTime.now().year - 18),
+      lastDate: DateTime.now(),
+      locale: const Locale('pt', 'BR'),
     );
 
     if (selecionada != null && selecionada != _dataNascimentoSelecionada) {
@@ -252,7 +249,6 @@ class _TelaPerfilState extends State<TelaPerfil> {
 
                     const SizedBox(height: 8),
 
-                    // CAMPO DE IDADE CORRIGIDO
                     _buildIdadeField(),
 
                     if (isEditing) _buildGeneroSelector(corGenero),
@@ -320,11 +316,8 @@ class _TelaPerfilState extends State<TelaPerfil> {
                   if (isEditing) {
                     Navigator.pop(context, {
                       'nome': nomeController.text,
-                      'dataNascimento':
-                          _dataNascimentoSelecionada, // Retorna o DateTime alterado
-                      'idade': _calcularIdadeString(
-                        _dataNascimentoSelecionada,
-                      ), // Caso precise da String em algum lugar
+                      'dataNascimento': _dataNascimentoSelecionada,
+                      'idade': _calcularIdadeString(_dataNascimentoSelecionada),
                       'genero': genero,
                       'escola': escolaController.text,
                       'emergencia': emergenciaController.text,
@@ -390,7 +383,7 @@ class _TelaPerfilState extends State<TelaPerfil> {
     );
   }
 
-  // NOVO WIDGET DE IDADE / DATA DE NASCIMENTO
+  // NOVO WIDGET DE IDADE
   Widget _buildIdadeField() {
     if (!isEditing) {
       // Exibe a idade calculada dinamicamente quando não está editando
@@ -548,7 +541,6 @@ class _TelaPerfilState extends State<TelaPerfil> {
                   nome: nomeController.text.isEmpty
                       ? 'Criança'
                       : nomeController.text,
-                  // Agora passa a idade calculada dinamicamente para a Ficha Médica!
                   idade: _calcularIdadeString(_dataNascimentoSelecionada),
                 ),
               ),
