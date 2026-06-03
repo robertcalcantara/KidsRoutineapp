@@ -7,6 +7,7 @@ import 'tela_historico.dart';
 import 'tela_configuracoes.dart';
 import 'tela_nova_atividade.dart';
 import 'tela_rotina.dart';
+import 'tela_ajuda_suporte.dart';
 
 void main() {
   runApp(const KidsRoutineApp());
@@ -35,6 +36,7 @@ class KidsRoutineApp extends StatelessWidget {
         '/historico': (context) => const TelaHistorico(),
         '/configuracoes': (context) => const TelaConfiguracoes(),
         '/nova-atividade': (context) => const NovaAtividadeScreen(),
+        '/ajuda-suporte': (context) => const TelaAjudaSuporte(),
         '/rotina': (context) {
           final filtro = ModalRoute.of(context)?.settings.arguments as String?;
           return TelaRotina(filtroInicial: filtro ?? 'Hoje');

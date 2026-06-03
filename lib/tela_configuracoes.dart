@@ -32,7 +32,6 @@ class TelaConfiguracoes extends StatelessWidget {
                     ),
                   ),
 
-                  // LOGO (Linhas 37 a 51)
                   SizedBox(
                     width: 70,
                     height: 70,
@@ -46,14 +45,16 @@ class TelaConfiguracoes extends StatelessWidget {
 
               const SizedBox(height: 55),
 
-              // OPÇÕES
+              // PREFERÊNCIAS DA CONTA
               _itemConfiguracao(
                 icon: Icons.groups,
                 texto: 'Preferências da Conta',
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Abrir Preferências da Conta'),
+                      content: Text(
+                        'Tela Preferências da Conta em desenvolvimento',
+                      ),
                     ),
                   );
                 },
@@ -65,12 +66,15 @@ class TelaConfiguracoes extends StatelessWidget {
 
               const SizedBox(height: 10),
 
+              // NOTIFICAÇÕES
               _itemConfiguracao(
                 icon: Icons.notifications,
                 texto: 'Notificações',
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Abrir Notificações')),
+                    const SnackBar(
+                      content: Text('Tela Notificações em desenvolvimento'),
+                    ),
                   );
                 },
               ),
@@ -81,13 +85,12 @@ class TelaConfiguracoes extends StatelessWidget {
 
               const SizedBox(height: 10),
 
+              // AJUDA E SUPORTE
               _itemConfiguracao(
                 icon: Icons.help_outline,
                 texto: 'Ajuda e Suporte',
                 onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Abrir Ajuda e Suporte')),
-                  );
+                  Navigator.pushNamed(context, '/ajuda-suporte');
                 },
               ),
 
