@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-// IMPORTANTE: Adicione a importação do arquivo da Ficha Médica aqui. 
-// Ajuste o caminho conforme a estrutura de pastas do seu grupo:
 import 'ficha_medica_screen.dart'; 
 
 class TelaPerfil extends StatefulWidget {
