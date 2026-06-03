@@ -50,13 +50,7 @@ class TelaConfiguracoes extends StatelessWidget {
                 icon: Icons.groups,
                 texto: 'Preferências da Conta',
                 onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Tela Preferências da Conta em desenvolvimento',
-                      ),
-                    ),
-                  );
+                  Navigator.pushNamed(context, '/preferencias-conta');
                 },
               ),
 
@@ -71,11 +65,7 @@ class TelaConfiguracoes extends StatelessWidget {
                 icon: Icons.notifications,
                 texto: 'Notificações',
                 onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Tela Notificações em desenvolvimento'),
-                    ),
-                  );
+                  Navigator.pushNamed(context, '/notificacoes');
                 },
               ),
 
