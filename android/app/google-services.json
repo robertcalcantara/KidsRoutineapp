@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "333564535358",
+    "project_id": "rotinakids-2a9ff",
+    "storage_bucket": "rotinakids-2a9ff.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:333564535358:android:6eafcc3476342814e3a76f",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEzQpAmwNTM7dp6UzQ3_U1vu4xxBJ34oY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

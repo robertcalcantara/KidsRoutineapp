@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 import 'tela_login.dart';
 import 'tela_cadastro.dart';
@@ -12,7 +14,14 @@ import 'tela_ajuda_suporte.dart';
 import 'tela_notificacoes.dart';
 import 'tela_preferencias_conta.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+print('FIREBASE INICIADO COM SUCESSO');
+
   runApp(const KidsRoutineApp());
 }
 
@@ -27,7 +36,9 @@ class KidsRoutineApp extends StatelessWidget {
 
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF1565C0)),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF1565C0),
+        ),
         useMaterial3: true,
       ),
 
@@ -44,8 +55,10 @@ class KidsRoutineApp extends StatelessWidget {
         '/recuperar-senha': (context) => const TelaRecuperarSenha(),
 
         // HOME
-        '/home': (context) =>
-            const TelaHome(nomeCrianca: 'Perfil Teste', idCrianca: '#0000'),
+        '/home': (context) => const TelaHome(
+              nomeCrianca: 'Perfil Teste',
+              idCrianca: '#0000',
+            ),
 
         // HISTÓRICO
         '/historico': (context) => const TelaHistorico(),
@@ -69,7 +82,9 @@ class KidsRoutineApp extends StatelessWidget {
         '/rotina': (context) {
           final filtro = ModalRoute.of(context)?.settings.arguments as String?;
 
-          return TelaRotina(filtroInicial: filtro ?? 'Hoje');
+          return TelaRotina(
+            filtroInicial: filtro ?? 'Hoje',
+          );
         },
       },
     );
