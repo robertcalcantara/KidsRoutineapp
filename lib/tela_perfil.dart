@@ -686,35 +686,6 @@ class _TelaPerfilState extends State<TelaPerfil> {
             ),
           ),
         ),
-
-        const SizedBox(height: 16),
-
-        OutlinedButton(
-          style: OutlinedButton.styleFrom(
-            side:
-                const BorderSide(color: Colors.black38),
-
-            minimumSize:
-                const Size(double.infinity, 55),
-
-            shape: RoundedRectangleBorder(
-              borderRadius:
-                  BorderRadius.circular(12),
-            ),
-          ),
-
-          onPressed: () {},
-
-          child: const Text(
-            "Excluir Criança",
-
-            style: TextStyle(
-              color: Colors.black54,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
       ],
     );
   }
