@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class TelaRecuperarSenha extends StatefulWidget {
@@ -29,10 +30,26 @@ class _TelaRecuperarSenhaState extends State<TelaRecuperarSenha> {
       return;
     }
 
-    _mostrarMensagem('E-mail de recuperação enviado com sucesso!');
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
 
-    if (mounted) {
-      Navigator.pop(context);
+      _mostrarMensagem('E-mail de recuperação enviado com sucesso!');
+
+      if (mounted) {
+        Navigator.pop(context);
+      }
+    } on FirebaseAuthException catch (e) {
+      String mensagem = 'Erro ao enviar recuperação de senha';
+
+      if (e.code == 'user-not-found') {
+        mensagem = 'Email não encontrado';
+      } else if (e.code == 'invalid-email') {
+        mensagem = 'Email inválido';
+      }
+
+      _mostrarMensagem(mensagem, ehErro: true);
+    } catch (e) {
+      _mostrarMensagem('Erro: $e', ehErro: true);
     }
   }
 

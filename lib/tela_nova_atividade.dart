@@ -42,7 +42,10 @@ class _NovaAtividadeScreenState extends State<NovaAtividadeScreen> {
               Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
+                    icon: const Icon(
+                      Icons.arrow_back_ios_new,
+                      color: Colors.black,
+                    ),
                     onPressed: () => Navigator.pop(context),
                   ),
                   const SizedBox(width: 8),
@@ -62,8 +65,13 @@ class _NovaAtividadeScreenState extends State<NovaAtividadeScreen> {
                 controller: _nomeController,
                 decoration: InputDecoration(
                   hintText: 'Ex: Almoço',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
                 ),
               ),
               const SizedBox(height: 25),
@@ -76,7 +84,10 @@ class _NovaAtividadeScreenState extends State<NovaAtividadeScreen> {
                 onTap: _selecionarData,
                 child: Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey),
                     borderRadius: BorderRadius.circular(12),
@@ -149,11 +160,36 @@ class _NovaAtividadeScreenState extends State<NovaAtividadeScreen> {
                 spacing: 12,
                 runSpacing: 12,
                 children: [
-                  _buildCategoryButton('Alimentação', '🍲', const Color(0xFFF7F433), Colors.black),
-                  _buildCategoryButton('Sono', '🌙', const Color(0xFF6342F7), Colors.white),
-                  _buildCategoryButton('Estudos', '📚', const Color(0xFF4CFF5C), Colors.black),
-                  _buildCategoryButton('Lazer', '🎮', const Color(0xFF29E7FA), Colors.black),
-                  _buildCategoryButton('Medicação', '💊', const Color(0xFFFF3333), Colors.white),
+                  _buildCategoryButton(
+                    'Alimentação',
+                    '🍲',
+                    const Color(0xFFF7F433),
+                    Colors.black,
+                  ),
+                  _buildCategoryButton(
+                    'Sono',
+                    '🌙',
+                    const Color(0xFF6342F7),
+                    Colors.white,
+                  ),
+                  _buildCategoryButton(
+                    'Estudos',
+                    '📚',
+                    const Color(0xFF4CFF5C),
+                    Colors.black,
+                  ),
+                  _buildCategoryButton(
+                    'Lazer',
+                    '🎮',
+                    const Color(0xFF29E7FA),
+                    Colors.black,
+                  ),
+                  _buildCategoryButton(
+                    'Medicação',
+                    '💊',
+                    const Color(0xFFFF3333),
+                    Colors.white,
+                  ),
                 ],
               ),
               const SizedBox(height: 50),
@@ -165,11 +201,17 @@ class _NovaAtividadeScreenState extends State<NovaAtividadeScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF4A90E2),
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                       child: const Text(
                         'Salvar',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
@@ -179,11 +221,17 @@ class _NovaAtividadeScreenState extends State<NovaAtividadeScreen> {
                       onPressed: () => Navigator.pop(context),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                       child: const Text(
                         'Cancelar',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
                       ),
                     ),
                   ),
@@ -255,7 +303,9 @@ class _NovaAtividadeScreenState extends State<NovaAtividadeScreen> {
     }
 
     final hora = int.tryParse(horaTexto.trim());
-    final minuto = minutoTexto.trim().isEmpty ? 0 : int.tryParse(minutoTexto.trim());
+    final minuto = minutoTexto.trim().isEmpty
+        ? 0
+        : int.tryParse(minutoTexto.trim());
 
     if (hora == null || hora < 0 || hora > 23) {
       _mostrarMensagem('Hora de $label inválida');
@@ -271,9 +321,9 @@ class _NovaAtividadeScreenState extends State<NovaAtividadeScreen> {
   }
 
   void _mostrarMensagem(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensagem)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(mensagem)));
   }
 
   String _formatarData(DateTime data) {
