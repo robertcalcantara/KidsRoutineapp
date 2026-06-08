@@ -1,6 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import 'storage_service.dart';
+import 'app_data.dart';
 import 'tela_home.dart';
 
 class TelaLogin extends StatefulWidget {
@@ -18,15 +19,31 @@ class _TelaLoginState extends State<TelaLogin> {
   bool carregando = false;
 
   Future<void> fazerLogin() async {
-    // LOGIN DEV
-    if (emailController.text.trim() == 'dev@kidsroutine.com' &&
-        senhaController.text.trim() == 'dev123') {
+    String email = emailController.text.trim();
+
+    String senha = senhaController.text.trim();
+
+    if (email.isEmpty || senha.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Preencha email e senha')),
+      );
+
+      return;
+    }
+
+    // LOGIN DEV PARA TESTES
+    if (email == 'dev@kidsroutine.com' && senha == 'dev123') {
+      AppData.nomeCrianca = 'Kid';
+      AppData.idCrianca = '#0000';
+
       Navigator.pushReplacement(
         context,
 
         MaterialPageRoute(
-          builder: (context) =>
-              const TelaHome(nomeCrianca: 'Kid', idCrianca: '#0000'),
+          builder: (context) => const TelaHome(
+            nomeCrianca: 'Kid',
+            idCrianca: '#0000',
+          ),
         ),
       );
 
@@ -37,55 +54,80 @@ class _TelaLoginState extends State<TelaLogin> {
       carregando = true;
     });
 
-    String email = emailController.text.trim();
+    try {
+      final credencial = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: senha,
+      );
 
-    String senha = senhaController.text.trim();
+      final nomeCrianca = credencial.user?.displayName;
 
-    // BUSCAR USUÁRIO
-    final usuario = await StorageService.buscarUsuario(email);
+      AppData.nomeCrianca =
+          nomeCrianca == null || nomeCrianca.isEmpty ? 'Perfil Teste' : nomeCrianca;
+      AppData.idCrianca = '#${credencial.user?.uid.substring(0, 4) ?? '0000'}';
 
-    // EMAIL NÃO EXISTE
-    if (usuario == null) {
-      setState(() {
-        carregando = false;
-      });
+      if (!mounted) return;
 
-      ScaffoldMessenger.of(
+      Navigator.pushReplacement(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Email não encontrado')));
 
-      return;
-    }
-
-    // SENHA ERRADA
-    if (usuario['senha'] != senha) {
-      setState(() {
-        carregando = false;
-      });
-
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Senha incorreta')));
-
-      return;
-    }
-
-    // LOGIN CORRETO
-    setState(() {
-      carregando = false;
-    });
-
-    Navigator.pushReplacement(
-      context,
-
-      MaterialPageRoute(
-        builder: (context) => TelaHome(
-          nomeCrianca: usuario['crianca'],
-
-          idCrianca: usuario['idCrianca'],
+        MaterialPageRoute(
+          builder: (context) => TelaHome(
+            nomeCrianca: AppData.nomeCrianca,
+            idCrianca: AppData.idCrianca,
+          ),
         ),
-      ),
-    );
+      );
+    } on FirebaseAuthException catch (e) {
+      String mensagem = 'Erro ao fazer login';
+
+      switch (e.code) {
+        case 'invalid-email':
+          mensagem = 'Email inválido';
+          break;
+
+        case 'user-not-found':
+          mensagem = 'Email não encontrado';
+          break;
+
+        case 'wrong-password':
+          mensagem = 'Senha incorreta';
+          break;
+
+        case 'invalid-credential':
+          mensagem = 'Email ou senha incorretos';
+          break;
+
+        case 'user-disabled':
+          mensagem = 'Usuário desativado';
+          break;
+      }
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(mensagem)),
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro: $e')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          carregando = false;
+        });
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    senhaController.dispose();
+    super.dispose();
   }
 
   @override
@@ -224,6 +266,8 @@ class _TelaLoginState extends State<TelaLogin> {
       controller: controller,
 
       obscureText: senha,
+
+      keyboardType: senha ? TextInputType.text : TextInputType.emailAddress,
 
       decoration: InputDecoration(
         hintText: texto,

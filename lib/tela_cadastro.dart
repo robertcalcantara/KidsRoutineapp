@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'app_data.dart';
+
 class TelaCadastro extends StatefulWidget {
   const TelaCadastro({super.key});
 
@@ -22,7 +24,8 @@ class _TelaCadastroState extends State<TelaCadastro> {
   Future<void> criarConta() async {
     if (emailController.text.trim().isEmpty ||
         senhaController.text.trim().isEmpty ||
-        confirmarSenhaController.text.trim().isEmpty) {
+        confirmarSenhaController.text.trim().isEmpty ||
+        criancaController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Preencha todos os campos obrigatórios'),
@@ -45,10 +48,15 @@ class _TelaCadastroState extends State<TelaCadastro> {
         carregando = true;
       });
 
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      final credencial = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailController.text.trim(),
         password: senhaController.text.trim(),
       );
+
+      await credencial.user?.updateDisplayName(criancaController.text.trim());
+
+      AppData.nomeCrianca = criancaController.text.trim();
+      AppData.idCrianca = '#${credencial.user?.uid.substring(0, 4) ?? '0000'}';
 
       if (!mounted) return;
 
