@@ -12,12 +12,6 @@ O projeto foi desenvolvido utilizando Flutter para o front-end, proporcionando u
 | Nome do Aluno              | Telas e Funcionalidades sob sua responsabilidade |
 |--------------------------|----------------------------------------------------------- |
 | Eliseu F. Martins       | Tela Login, tela cadastro, tela rec. de senha, tela home,     |
-|                         | autenticação FireBase(E-mail/Senha), Login com Google Sign-in |
-|                         | validação domínio institucional, tratamento de erros de       |
-|                         | autenticação, integração com FireBase Authentication          |
-|                         | configuração do OAuth para ambiente Web.                      |
-|                         | Vídeo de defesa: https://canva.link/8ur5db580l4jq77           |
-
 | Rafael Dantas           | Tela de geraçao e criaçao de relatorio medico/pdf             |
 | Luís Eduardo Cunha M.   | Perfil da criança (visualizar, editar, excluir dados)         |
 | Pedro Roberto N. Melo   | Cadastro de atividades, horários, categorias e repetição      |
