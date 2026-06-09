@@ -1,11 +1,11 @@
+import 'dart:async'; // Necessário para o StreamSubscription
 import 'package:flutter/material.dart';
-// Importações necessárias para o PDF
+import 'package:cloud_firestore/cloud_firestore.dart'; // Importação do Firebase
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
 class FichaMedicaScreen extends StatefulWidget {
-  // 1. ADICIONAMOS AS VARIÁVEIS QUE VÃO RECEBER OS DADOS DA OUTRA TELA
   final String nome;
   final String idade;
 
@@ -20,7 +20,6 @@ class FichaMedicaScreen extends StatefulWidget {
 }
 
 class _FichaMedicaScreenState extends State<FichaMedicaScreen> {
-  // Controladores para capturar o que o usuário digitar
   final _tipoSanguineoController = TextEditingController();
   final _alergiasController = TextEditingController();
   final _comorbidadesController = TextEditingController();
@@ -29,9 +28,67 @@ class _FichaMedicaScreenState extends State<FichaMedicaScreen> {
   final _contatoController = TextEditingController();
   final _observacoesController = TextEditingController();
 
+  // Instância do Firestore e Variável para escutar os dados
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  StreamSubscription<DocumentSnapshot>? _fichaSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _ouvirDadosEmTempoReal();
+  }
+
+  // 1. REQUISITO: ATUALIZAR EM TEMPO REAL
+  void _ouvirDadosEmTempoReal() {
+    // Usando o nome da criança como ID do documento (Idealmente, use um ID único gerado)
+    final docId = widget.nome.replaceAll(' ', '_'); 
+
+    _fichaSubscription = _db.collection('fichasMedicas').doc(docId).snapshots().listen((snapshot) {
+      if (snapshot.exists && snapshot.data() != null) {
+        final data = snapshot.data() as Map<String, dynamic>;
+        
+        // Atualiza os campos apenas se estiverem vazios ou diferentes para não atrapalhar a digitação
+        if (_tipoSanguineoController.text != data['tipoSanguineo']) _tipoSanguineoController.text = data['tipoSanguineo'] ?? '';
+        if (_alergiasController.text != data['alergias']) _alergiasController.text = data['alergias'] ?? '';
+        if (_comorbidadesController.text != data['comorbidades']) _comorbidadesController.text = data['comorbidades'] ?? '';
+        if (_medicamentosController.text != data['medicamentos']) _medicamentosController.text = data['medicamentos'] ?? '';
+        if (_restricoesController.text != data['restricoes']) _restricoesController.text = data['restricoes'] ?? '';
+        if (_contatoController.text != data['contato']) _contatoController.text = data['contato'] ?? '';
+        if (_observacoesController.text != data['observacoes']) _observacoesController.text = data['observacoes'] ?? '';
+      }
+    });
+  }
+
+  // 2. REQUISITO: PERSISTIR OS DADOS
+  Future<void> _salvarDadosNoFirebase() async {
+    final docId = widget.nome.replaceAll(' ', '_');
+    
+    await _db.collection('fichasMedicas').doc(docId).set({
+      'nome': widget.nome,
+      'idade': widget.idade,
+      'tipoSanguineo': _tipoSanguineoController.text,
+      'alergias': _alergiasController.text,
+      'comorbidades': _comorbidadesController.text,
+      'medicamentos': _medicamentosController.text,
+      'restricoes': _restricoesController.text,
+      'contato': _contatoController.text,
+      'observacoes': _observacoesController.text,
+      'ultimaAtualizacao': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true)); // merge: true garante que não vai apagar dados antigos acidentalmente
+    
+    // Exibe um aviso visual rápido de que foi salvo com sucesso
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Dados salvos na nuvem!'), duration: Duration(seconds: 2), backgroundColor: Colors.green),
+      );
+    }
+  }
+
   @override
   void dispose() {
-    // É importante limpar os controladores da memória quando fechar a tela
+    // É importante cancelar a escuta do Firebase ao sair da tela
+    _fichaSubscription?.cancel();
+    
     _tipoSanguineoController.dispose();
     _alergiasController.dispose();
     _comorbidadesController.dispose();
@@ -42,12 +99,14 @@ class _FichaMedicaScreenState extends State<FichaMedicaScreen> {
     super.dispose();
   }
 
-  // Função que será chamada ao clicar em "Gerar PDF"
+  // 3. REQUISITO: GARANTIR QUE O PDF GERE COM OS DADOS PREENCHIDOS
   Future<void> _gerarPDF() async {
+    // PRIMEIRO: Salva os dados no Firebase antes de gerar o PDF
+    await _salvarDadosNoFirebase();
+
     // Cria o documento PDF
     final pdf = pw.Document();
 
-    // Função auxiliar para desenhar cada campo no PDF
     pw.Widget buildPdfField(String titulo, String valor) {
       return pw.Padding(
         padding: const pw.EdgeInsets.only(bottom: 12.0),
@@ -65,7 +124,6 @@ class _FichaMedicaScreenState extends State<FichaMedicaScreen> {
       );
     }
 
-    // Adiciona uma página ao PDF
     pdf.addPage(
       pw.Page(
         pageFormat: PdfPageFormat.a4,
@@ -74,23 +132,17 @@ class _FichaMedicaScreenState extends State<FichaMedicaScreen> {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              // Cabeçalho do PDF
               pw.Header(
                 level: 0,
                 child: pw.Text(
-                  // 2. O NOME NO PDF AGORA É DINÂMICO
                   'Ficha Médica - ${widget.nome}',
                   style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
                 ),
               ),
               pw.SizedBox(height: 20),
-
-              // Dados da Criança
-              // 3. A IDADE NO PDF AGORA É DINÂMICA
               pw.Text('Idade: ${widget.idade}', style: const pw.TextStyle(fontSize: 14)),
               pw.SizedBox(height: 30),
 
-              // Campos Preenchidos
               buildPdfField('Tipo Sanguíneo', _tipoSanguineoController.text),
               buildPdfField('Alergias', _alergiasController.text),
               buildPdfField('Comorbidades', _comorbidadesController.text),
@@ -104,10 +156,9 @@ class _FichaMedicaScreenState extends State<FichaMedicaScreen> {
       ),
     );
 
-    // Exibe a tela de pré-visualização e salvamento do dispositivo
     await Printing.layoutPdf(
       onLayout: (PdfPageFormat format) async => pdf.save(),
-      name: 'Ficha_Medica_${widget.nome.replaceAll(' ', '_')}.pdf', // Nome do arquivo gerado também fica dinâmico!
+      name: 'Ficha_Medica_${widget.nome.replaceAll(' ', '_')}.pdf',
     );
   }
 
@@ -146,7 +197,6 @@ class _FichaMedicaScreenState extends State<FichaMedicaScreen> {
             ),
             const SizedBox(height: 32),
 
-            // Card de Perfil da Criança
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -165,13 +215,11 @@ class _FichaMedicaScreenState extends State<FichaMedicaScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        // 4. O NOME NA TELA AGORA É DINÂMICO
                         widget.nome,
                         style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        // 5. A IDADE NA TELA AGORA É DINÂMICA
                         widget.idade,
                         style: TextStyle(fontSize: 15, color: Colors.grey[600]),
                       ),
@@ -182,7 +230,6 @@ class _FichaMedicaScreenState extends State<FichaMedicaScreen> {
             ),
             const SizedBox(height: 32),
 
-            // Campos do formulário associados aos controladores
             _buildCustomField(
               controller: _tipoSanguineoController,
               label: 'Tipo sanguíneo',
@@ -236,7 +283,26 @@ class _FichaMedicaScreenState extends State<FichaMedicaScreen> {
 
             const SizedBox(height: 8),
 
-            // Botão Gerar PDF
+            // Botão Apenas Salvar (Opcional para o usuário)
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: OutlinedButton.icon(
+                onPressed: _salvarDadosNoFirebase,
+                icon: const Icon(Icons.cloud_upload_outlined, color: Colors.blue),
+                label: const Text(
+                  'SALVAR DADOS',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue, letterSpacing: 1.2),
+                ),
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colors.blue, width: 2),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // Botão Gerar PDF (Que agora também salva antes de gerar)
             SizedBox(
               width: double.infinity,
               height: 56,
@@ -256,7 +322,6 @@ class _FichaMedicaScreenState extends State<FichaMedicaScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Rodapé
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -275,7 +340,6 @@ class _FichaMedicaScreenState extends State<FichaMedicaScreen> {
     );
   }
 
-  // Widget construtor dos campos de texto
   Widget _buildCustomField({
     required TextEditingController controller,
     required String label,
