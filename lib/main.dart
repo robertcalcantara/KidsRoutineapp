@@ -13,15 +13,12 @@ import 'tela_rotina.dart';
 import 'tela_ajuda_suporte.dart';
 import 'tela_notificacoes.dart';
 import 'tela_preferencias_conta.dart';
+import 'app_data.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-print('FIREBASE INICIADO COM SUCESSO');
-
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  print('FIREBASE INICIADO COM SUCESSO');
   runApp(const KidsRoutineApp());
 }
 
@@ -33,58 +30,33 @@ class KidsRoutineApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Kids Routine',
-
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF1565C0),
-        ),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF1565C0)),
         useMaterial3: true,
       ),
-
       initialRoute: '/',
-
       routes: {
-        // LOGIN
         '/': (context) => const TelaLogin(),
-
-        // CADASTRO
         '/cadastro': (context) => const TelaCadastro(),
-
-        // RECUPERAR SENHA
         '/recuperar-senha': (context) => const TelaRecuperarSenha(),
 
-        // HOME
-        '/home': (context) => const TelaHome(
-              nomeCrianca: 'Perfil Teste',
-              idCrianca: '#0000',
+        // TelaHome agora usa AppData; os parâmetros são só fallback
+        '/home': (context) => TelaHome(
+              nomeCrianca: AppData.nomeCrianca,
+              idCrianca: AppData.idCrianca,
             ),
 
-        // HISTÓRICO
         '/historico': (context) => const TelaHistorico(),
-
-        // CONFIGURAÇÕES
         '/configuracoes': (context) => const TelaConfiguracoes(),
-
-        // NOVA ATIVIDADE
         '/nova-atividade': (context) => const NovaAtividadeScreen(),
-
-        // AJUDA E SUPORTE
         '/ajuda-suporte': (context) => const TelaAjudaSuporte(),
-
-        // NOTIFICAÇÕES
         '/notificacoes': (context) => const TelaNotificacoes(),
-
-        // PREFERÊNCIAS DA CONTA
         '/preferencias-conta': (context) => const TelaPreferenciasConta(),
 
-        // ROTINA
         '/rotina': (context) {
           final filtro = ModalRoute.of(context)?.settings.arguments as String?;
-
-          return TelaRotina(
-            filtroInicial: filtro ?? 'Hoje',
-          );
+          return TelaRotina(filtroInicial: filtro ?? 'Hoje');
         },
       },
     );

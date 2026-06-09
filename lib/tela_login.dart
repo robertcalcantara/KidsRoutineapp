@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import 'app_data.dart';
+import 'child_service.dart';
 import 'tela_home.dart';
 
 class TelaLogin extends StatefulWidget {
@@ -17,25 +18,33 @@ class _TelaLoginState extends State<TelaLogin> {
   final TextEditingController senhaController = TextEditingController();
 
   static const String dominioPermitido = '@souunit.com.br';
-
   bool carregando = false;
 
-  bool emailInstitucionalValido(String? email) {
-    return email != null && email.toLowerCase().endsWith(dominioPermitido);
-  }
+  bool emailInstitucionalValido(String? email) =>
+      email != null && email.toLowerCase().endsWith(dominioPermitido);
 
   Future<void> logoutPorDominioInvalido() async {
     await FirebaseAuth.instance.signOut();
     await GoogleSignIn().signOut();
   }
 
-  void abrirHome(User? usuario) {
-    final nomeCrianca = usuario?.displayName;
-
-    AppData.nomeCrianca = nomeCrianca == null || nomeCrianca.isEmpty
-        ? 'Perfil Teste'
-        : nomeCrianca;
+  // ─── Abre Home após carregar perfil do Firestore ──────────────────────────
+  Future<void> abrirHome(User? usuario) async {
+    // ID sempre do Firebase Auth
     AppData.idCrianca = '#${usuario?.uid.substring(0, 4) ?? '0000'}';
+
+    // Tenta carregar perfil do Firestore
+    final data = await ChildService.getPerfil();
+    if (data != null) {
+      AppData.fromFirestore(data);
+    } else {
+      // Primeira vez: usa displayName do Auth e cria o documento
+      final nome = usuario?.displayName ?? '';
+      AppData.nomeCrianca = nome.isNotEmpty ? nome : 'Meu Filho(a)';
+      await ChildService.criarPerfilInicial(AppData.nomeCrianca);
+    }
+
+    if (!mounted) return;
 
     Navigator.pushReplacement(
       context,
@@ -53,15 +62,11 @@ class _TelaLoginState extends State<TelaLogin> {
     String senha = senhaController.text.trim();
 
     if (email.isEmpty || senha.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Preencha email e senha')),
-      );
+      _snack('Preencha email e senha');
       return;
     }
 
-    setState(() {
-      carregando = true;
-    });
+    setState(() => carregando = true);
 
     try {
       final credencial = await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -71,117 +76,69 @@ class _TelaLoginState extends State<TelaLogin> {
 
       if (!emailInstitucionalValido(credencial.user?.email)) {
         await logoutPorDominioInvalido();
-
         if (!mounted) return;
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Acesso permitido apenas para contas @souunit.com.br'),
-          ),
-        );
+        _snack('Acesso permitido apenas para contas @souunit.com.br');
         return;
       }
 
       if (!mounted) return;
-      abrirHome(credencial.user);
+      await abrirHome(credencial.user);
     } on FirebaseAuthException catch (e) {
       String mensagem = 'Erro ao fazer login';
-
       switch (e.code) {
-        case 'invalid-email':
-          mensagem = 'Email inválido';
-          break;
-        case 'user-not-found':
-          mensagem = 'Email não encontrado';
-          break;
-        case 'wrong-password':
-          mensagem = 'Senha incorreta';
-          break;
-        case 'invalid-credential':
-          mensagem = 'Email ou senha incorretos';
-          break;
-        case 'user-disabled':
-          mensagem = 'Usuário desativado';
-          break;
+        case 'invalid-email':      mensagem = 'Email inválido'; break;
+        case 'user-not-found':     mensagem = 'Email não encontrado'; break;
+        case 'wrong-password':     mensagem = 'Senha incorreta'; break;
+        case 'invalid-credential': mensagem = 'Email ou senha incorretos'; break;
+        case 'user-disabled':      mensagem = 'Usuário desativado'; break;
       }
-
       if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(mensagem)),
-      );
+      _snack(mensagem);
     } catch (e) {
       if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro: $e')),
-      );
+      _snack('Erro: $e');
     } finally {
-      if (mounted) {
-        setState(() {
-          carregando = false;
-        });
-      }
+      if (mounted) setState(() => carregando = false);
     }
   }
 
   Future<void> fazerLoginGoogle() async {
-    setState(() {
-      carregando = true;
-    });
+    setState(() => carregando = true);
 
     try {
       final googleUser = await GoogleSignIn().signIn();
-
-      if (googleUser == null) {
-        return;
-      }
+      if (googleUser == null) return;
 
       final googleAuth = await googleUser.authentication;
-
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      final credencial = await FirebaseAuth.instance.signInWithCredential(
-        credential,
-      );
+      final credencial = await FirebaseAuth.instance.signInWithCredential(credential);
 
       if (!emailInstitucionalValido(credencial.user?.email)) {
         await logoutPorDominioInvalido();
-
         if (!mounted) return;
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Acesso permitido apenas para contas @souunit.com.br'),
-          ),
-        );
+        _snack('Acesso permitido apenas para contas @souunit.com.br');
         return;
       }
 
       if (!mounted) return;
-      abrirHome(credencial.user);
+      await abrirHome(credencial.user);
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro no login com Google: ${e.message}')),
-      );
+      _snack('Erro no login com Google: ${e.message}');
     } catch (e) {
       if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro no login com Google: $e')),
-      );
+      _snack('Erro no login com Google: $e');
     } finally {
-      if (mounted) {
-        setState(() {
-          carregando = false;
-        });
-      }
+      if (mounted) setState(() => carregando = false);
     }
+  }
+
+  void _snack(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 
   @override
@@ -207,10 +164,7 @@ class _TelaLoginState extends State<TelaLogin> {
                 child: SizedBox(
                   width: 80,
                   height: 80,
-                  child: Image.asset(
-                    'assets/images/logo.png',
-                    fit: BoxFit.contain,
-                  ),
+                  child: Image.asset('assets/images/logo.png', fit: BoxFit.contain),
                 ),
               ),
 
@@ -218,28 +172,18 @@ class _TelaLoginState extends State<TelaLogin> {
               Image.asset('assets/images/family.png', height: 250),
               const SizedBox(height: 30),
 
-              const Text(
-                'Login',
-                style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
-              ),
-
+              const Text('Login', style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold)),
               const SizedBox(height: 40),
+
               campoTexto(controller: emailController, texto: 'Email'),
               const SizedBox(height: 20),
-              campoTexto(
-                controller: senhaController,
-                texto: 'Senha',
-                senha: true,
-              ),
-
+              campoTexto(controller: senhaController, texto: 'Senha', senha: true),
               const SizedBox(height: 10),
 
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/recuperar-senha');
-                  },
+                  onPressed: () => Navigator.pushNamed(context, '/recuperar-senha'),
                   child: const Text('Esqueci minha senha'),
                 ),
               ),
@@ -253,20 +197,11 @@ class _TelaLoginState extends State<TelaLogin> {
                   onPressed: carregando ? null : fazerLogin,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF4E8FE8),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
                   child: carregando
                       ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text(
-                          'ENTRAR',
-                          style: TextStyle(
-                            fontSize: 22,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                      : const Text('ENTRAR', style: TextStyle(fontSize: 22, color: Colors.white, fontWeight: FontWeight.bold)),
                 ),
               ),
 
@@ -278,14 +213,9 @@ class _TelaLoginState extends State<TelaLogin> {
                 child: OutlinedButton.icon(
                   onPressed: carregando ? null : fazerLoginGoogle,
                   icon: const Icon(Icons.login),
-                  label: const Text(
-                    'Entrar com Google',
-                    style: TextStyle(fontSize: 18),
-                  ),
+                  label: const Text('Entrar com Google', style: TextStyle(fontSize: 18)),
                   style: OutlinedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
                 ),
               ),
@@ -293,13 +223,8 @@ class _TelaLoginState extends State<TelaLogin> {
               const SizedBox(height: 20),
 
               TextButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/cadastro');
-                },
-                child: const Text(
-                  'Criar nova conta',
-                  style: TextStyle(fontSize: 16),
-                ),
+                onPressed: () => Navigator.pushNamed(context, '/cadastro'),
+                child: const Text('Criar nova conta', style: TextStyle(fontSize: 16)),
               ),
             ],
           ),
@@ -308,11 +233,7 @@ class _TelaLoginState extends State<TelaLogin> {
     );
   }
 
-  Widget campoTexto({
-    required TextEditingController controller,
-    required String texto,
-    bool senha = false,
-  }) {
+  Widget campoTexto({required TextEditingController controller, required String texto, bool senha = false}) {
     return TextField(
       controller: controller,
       obscureText: senha,
