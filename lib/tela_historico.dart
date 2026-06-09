@@ -97,7 +97,7 @@ class _TelaHistoricoState extends State<TelaHistorico> {
                       )
                     : ListView.separated(
                         itemCount: historico.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 22),
+                        separatorBuilder: (_, _) => const SizedBox(height: 22),
                         itemBuilder: (context, index) {
                           final atividade = historico[index];
                           return CardHistorico(

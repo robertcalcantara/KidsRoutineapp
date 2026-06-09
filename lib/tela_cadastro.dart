@@ -21,6 +21,12 @@ class _TelaCadastroState extends State<TelaCadastro> {
 
   bool carregando = false;
 
+  static const String dominioPermitido = '@souunit.com.br';
+
+  bool emailInstitucionalValido(String email) {
+    return email.toLowerCase().endsWith(dominioPermitido);
+  }
+
   Future<void> criarConta() async {
     if (emailController.text.trim().isEmpty ||
         senhaController.text.trim().isEmpty ||
@@ -29,6 +35,15 @@ class _TelaCadastroState extends State<TelaCadastro> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Preencha todos os campos obrigatórios'),
+        ),
+      );
+      return;
+    }
+
+    if (!emailInstitucionalValido(emailController.text.trim())) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Use apenas email institucional @souunit.com.br'),
         ),
       );
       return;
