@@ -15,6 +15,8 @@ import 'tela_notificacoes.dart';
 import 'tela_preferencias_conta.dart';
 import 'app_data.dart';
 
+///flutter run -d chrome --web-port=5000
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);

@@ -1,6 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+
 import 'atividade.dart';
-import 'app_data.dart';
 import 'widgets/navbar.dart';
 
 class TelaHistorico extends StatefulWidget {
@@ -14,8 +15,11 @@ class _TelaHistoricoState extends State<TelaHistorico> {
   String filtroSelecionado = 'Hoje';
   DateTime mesSelecionado = DateTime.now();
 
-  List<Atividade> get atividadesConcluidas {
-    final lista = AppData.atividades
+  Stream<QuerySnapshot<Map<String, dynamic>>> get _atividadesStream =>
+      FirebaseFirestore.instance.collection('atividades').snapshots();
+
+  List<Atividade> _atividadesConcluidas(List<Atividade> atividades) {
+    final lista = atividades
         .where((atividade) => atividade.concluida)
         .where(_atividadeDentroDoFiltro)
         .toList();
@@ -31,87 +35,111 @@ class _TelaHistoricoState extends State<TelaHistorico> {
 
   @override
   Widget build(BuildContext context) {
-    final historico = atividadesConcluidas;
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      stream: _atividadesStream,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Scaffold(
+            backgroundColor: const Color(0xFFF4F4F4),
+            bottomNavigationBar: const Navbar(currentIndex: 2),
+            body: Center(child: Text('Erro ao carregar histórico: ${snapshot.error}')),
+          );
+        }
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF4F4F4),
-      bottomNavigationBar: const Navbar(currentIndex: 2),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 18),
-          child: Column(
-            children: [
-              const SizedBox(height: 15),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        if (!snapshot.hasData) {
+          return const Scaffold(
+            backgroundColor: Color(0xFFF4F4F4),
+            bottomNavigationBar: Navbar(currentIndex: 2),
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        final atividades = snapshot.data!.docs
+            .map((doc) => Atividade.fromFirestore(doc))
+            .toList();
+        final historico = _atividadesConcluidas(atividades);
+
+        return Scaffold(
+          backgroundColor: const Color(0xFFF4F4F4),
+          bottomNavigationBar: const Navbar(currentIndex: 2),
+          body: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 18),
+              child: Column(
                 children: [
-                  const SizedBox(width: 50),
-                  const Text(
-                    'Histórico',
-                    style: TextStyle(
-                      fontSize: 34,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.black,
-                    ),
-                  ),
-                  SizedBox(
-                    width: 70,
-                    height: 70,
-                    child: Image.asset(
-                      'assets/images/logo.png',
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 28),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _botaoFiltro('Hoje'),
-                  _botaoFiltro('Semana'),
-                  _botaoFiltro('Mês'),
-                ],
-              ),
-              const SizedBox(height: 20),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  _textoFiltro(),
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Expanded(
-                child: historico.isEmpty
-                    ? const Center(
-                        child: Text(
-                          'Nenhuma atividade concluída neste período',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.grey,
-                            fontWeight: FontWeight.w700,
-                          ),
+                  const SizedBox(height: 15),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const SizedBox(width: 50),
+                      const Text(
+                        'Histórico',
+                        style: TextStyle(
+                          fontSize: 34,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.black,
                         ),
-                      )
-                    : ListView.separated(
-                        itemCount: historico.length,
-                        separatorBuilder: (_, _) => const SizedBox(height: 22),
-                        itemBuilder: (context, index) {
-                          final atividade = historico[index];
-                          return CardHistorico(
-                            data: _formatarDataCurta(atividade.data),
-                            atividade: atividade.nome,
-                            horario: _formatarHorarioConclusao(atividade),
-                          );
-                        },
                       ),
+                      SizedBox(
+                        width: 70,
+                        height: 70,
+                        child: Image.asset(
+                          'assets/images/logo.png',
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 28),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _botaoFiltro('Hoje'),
+                      _botaoFiltro('Semana'),
+                      _botaoFiltro('Mês'),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      _textoFiltro(),
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Expanded(
+                    child: historico.isEmpty
+                        ? const Center(
+                            child: Text(
+                              'Nenhuma atividade concluída neste período',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          )
+                        : ListView.separated(
+                            itemCount: historico.length,
+                            separatorBuilder: (_, _) => const SizedBox(height: 22),
+                            itemBuilder: (context, index) {
+                              final atividade = historico[index];
+                              return CardHistorico(
+                                data: _formatarDataCurta(atividade.data),
+                                atividade: atividade.nome,
+                                horario: _formatarHorarioConclusao(atividade),
+                              );
+                            },
+                          ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 

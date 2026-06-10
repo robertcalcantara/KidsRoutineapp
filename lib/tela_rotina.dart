@@ -350,24 +350,77 @@ class _TelaRotinaState extends State<TelaRotina> {
               ],
             ),
           ),
-          Checkbox(
-  value: atividade.concluida,
-  activeColor: Colors.green,
-  onChanged: (value) async {
-    await FirebaseFirestore.instance
-        .collection('atividades')
-        .doc(atividade.id)
-        .update({
-      'concluida': value,
-      'concluidaEm': value == true
-          ? Timestamp.now()
-          : null,
-    });
-  },
-),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Checkbox(
+                value: atividade.concluida,
+                activeColor: Colors.green,
+                onChanged: (value) async {
+                  await FirebaseFirestore.instance
+                      .collection('atividades')
+                      .doc(atividade.id)
+                      .update({
+                    'concluida': value,
+                    'concluidaEm': value == true ? Timestamp.now() : null,
+                  });
+                },
+              ),
+              IconButton(
+                tooltip: 'Excluir atividade',
+                icon: const Icon(Icons.delete_outline, color: Colors.red),
+                onPressed: () => _confirmarExclusaoAtividade(atividade),
+              ),
+            ],
+          ),
         ],
       ),
     );
+  }
+
+
+  Future<void> _confirmarExclusaoAtividade(Atividade atividade) async {
+    final confirmar = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Excluir atividade'),
+        content: Text('Deseja excluir "${atividade.nome}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () => Navigator.pop(context, true),
+            icon: const Icon(Icons.delete, color: Colors.white),
+            label: const Text('Excluir', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmar != true) return;
+
+    try {
+      await FirebaseFirestore.instance
+          .collection('atividades')
+          .doc(atividade.id)
+          .delete();
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Atividade excluída com sucesso!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao excluir atividade: $e')),
+      );
+    }
   }
 
   Color getCategoriaColor(String categoria) {

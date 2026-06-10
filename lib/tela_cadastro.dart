@@ -30,6 +30,7 @@ class _TelaCadastroState extends State<TelaCadastro> {
     if (emailController.text.trim().isEmpty ||
         senhaController.text.trim().isEmpty ||
         confirmarSenhaController.text.trim().isEmpty ||
+        responsavel1Controller.text.trim().isEmpty ||
         criancaController.text.trim().isEmpty) {
       _snack('Preencha todos os campos obrigatórios');
       return;
@@ -53,14 +54,24 @@ class _TelaCadastroState extends State<TelaCadastro> {
         password: senhaController.text.trim(),
       );
 
-      await credencial.user?.updateDisplayName(criancaController.text.trim());
+      final nomeResponsavel = responsavel1Controller.text.trim();
+      final nomeCrianca = criancaController.text.trim();
 
-      // Atualiza cache
-      AppData.nomeCrianca = criancaController.text.trim();
+      // O displayName do Firebase Auth representa o responsável.
+      // O nome da criança fica salvo separado no Firestore.
+      await credencial.user?.updateDisplayName(nomeResponsavel);
+
+      // Atualiza cache com o nome da criança, não do responsável.
+      AppData.nomeCrianca = nomeCrianca;
       AppData.idCrianca   = '#${credencial.user?.uid.substring(0, 4) ?? '0000'}';
 
-      // Cria o documento do perfil no Firestore
-      await ChildService.criarPerfilInicial(criancaController.text.trim());
+      // Cria o documento do perfil da criança no Firestore.
+      await ChildService.criarPerfilInicial(
+        nomeCrianca,
+        responsavel1: nomeResponsavel,
+        responsavel2: responsavel2Controller.text.trim(),
+        emailResponsavel: emailController.text.trim(),
+      );
 
       if (!mounted) return;
 

@@ -38,18 +38,34 @@ class ChildService {
 
   // ─── UPLOAD foto ─────────────────────────────────────────────────────────
   static Future<String> uploadFoto(Uint8List bytes) async {
-    final ref = _storage.ref().child('users/$_uid/perfil.jpg');
-    await ref.putData(bytes, SettableMetadata(contentType: 'image/jpeg'));
+    // Usa nome único para evitar cache antigo da imagem no app.
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final ref = _storage.ref().child('users/$_uid/profile/perfil_$timestamp.jpg');
+
+    await ref.putData(
+      bytes,
+      SettableMetadata(
+        contentType: 'image/jpeg',
+        cacheControl: 'no-cache, max-age=0',
+      ),
+    );
+
     return await ref.getDownloadURL();
   }
 
   // ─── CRIAR perfil inicial após cadastro ───────────────────────────────────
-  static Future<void> criarPerfilInicial(String nomeCrianca) async {
-    final snap = await _perfilDoc.get();
-    if (snap.exists) return; // já existe, não sobrescreve
-
-    await _perfilDoc.set({
-      'nome': nomeCrianca,
+  static Future<void> criarPerfilInicial(
+    String nomeCrianca, {
+    String responsavel1 = '',
+    String responsavel2 = '',
+    String emailResponsavel = '',
+  }) async {
+    final nomeLimpo = nomeCrianca.trim();
+    final dados = {
+      'nome': nomeLimpo.isNotEmpty ? nomeLimpo : 'Criança',
+      'responsavel1': responsavel1.trim(),
+      'responsavel2': responsavel2.trim(),
+      'emailResponsavel': emailResponsavel.trim(),
       'idade': '',
       'unidadeIdade': 'anos',
       'genero': 'feminino',
@@ -59,6 +75,21 @@ class ChildService {
       'fotoUrl': '',
       'createdAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
-    });
+    };
+
+    final snap = await _perfilDoc.get();
+    if (snap.exists) {
+      // Não sobrescreve o perfil já criado/editado.
+      // Apenas garante que os campos de responsável existam.
+      await _perfilDoc.set({
+        if (responsavel1.trim().isNotEmpty) 'responsavel1': responsavel1.trim(),
+        if (responsavel2.trim().isNotEmpty) 'responsavel2': responsavel2.trim(),
+        if (emailResponsavel.trim().isNotEmpty) 'emailResponsavel': emailResponsavel.trim(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+      return;
+    }
+
+    await _perfilDoc.set(dados);
   }
 }

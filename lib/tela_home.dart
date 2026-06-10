@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'widgets/navbar.dart';
@@ -36,16 +37,22 @@ class _TelaHomeState extends State<TelaHome> {
   String get fotoUrl     => AppData.fotoUrl;
   Uint8List? get fotoPerfil => AppData.fotoPerfil;
 
-  List<Atividade> get atividades => AppData.atividades;
+  Stream<QuerySnapshot<Map<String, dynamic>>> get _atividadesStream =>
+      FirebaseFirestore.instance.collection('atividades').snapshots();
 
-  List<Atividade> get atividadesHoje => atividades.where((a) {
-        final hoje = DateTime.now();
-        return a.data.day == hoje.day &&
-            a.data.month == hoje.month &&
-            a.data.year == hoje.year;
-      }).toList();
+  List<Atividade> _atividadesHoje(List<Atividade> atividades) {
+    final hoje = DateTime.now();
+    final lista = atividades.where((a) {
+      return a.data.day == hoje.day &&
+          a.data.month == hoje.month &&
+          a.data.year == hoje.year;
+    }).toList();
 
-  List<Atividade> get ultimasConcluidas {
+    lista.sort((a, b) => a.inicio.compareTo(b.inicio));
+    return lista;
+  }
+
+  List<Atividade> _ultimasConcluidas(List<Atividade> atividades) {
     final lista = atividades.where((a) => a.concluida).toList();
     lista.sort((a, b) {
       final dataA = a.concluidaEm ?? a.data;
@@ -53,6 +60,18 @@ class _TelaHomeState extends State<TelaHome> {
       return dataB.compareTo(dataA);
     });
     return lista.take(3).toList();
+  }
+
+  Future<void> _atualizarConclusao(Atividade atividade, bool? value) async {
+    if (value == null) return;
+
+    await FirebaseFirestore.instance
+        .collection('atividades')
+        .doc(atividade.id)
+        .update({
+      'concluida': value,
+      'concluidaEm': value ? Timestamp.now() : null,
+    });
   }
 
   String _formatarData(DateTime data) =>
@@ -89,7 +108,32 @@ class _TelaHomeState extends State<TelaHome> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      stream: _atividadesStream,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Scaffold(
+            backgroundColor: const Color(0xFFF5F5F5),
+            bottomNavigationBar: const Navbar(currentIndex: 0),
+            body: Center(child: Text('Erro ao carregar atividades: ${snapshot.error}')),
+          );
+        }
+
+        if (!snapshot.hasData) {
+          return const Scaffold(
+            backgroundColor: Color(0xFFF5F5F5),
+            bottomNavigationBar: Navbar(currentIndex: 0),
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        final atividades = snapshot.data!.docs
+            .map((doc) => Atividade.fromFirestore(doc))
+            .toList();
+        final atividadesHoje = _atividadesHoje(atividades);
+        final ultimasConcluidas = _ultimasConcluidas(atividades);
+
+        return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       bottomNavigationBar: const Navbar(currentIndex: 0),
       body: SafeArea(
@@ -283,11 +327,8 @@ class _TelaHomeState extends State<TelaHome> {
                                           Checkbox(
                                             value: atividade.concluida,
                                             activeColor: Colors.green,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                atividade.concluida = value!;
-                                                atividade.concluidaEm = value ? DateTime.now() : null;
-                                              });
+                                            onChanged: (value) async {
+                                              await _atualizarConclusao(atividade, value);
                                             },
                                           ),
                                         ],
@@ -309,13 +350,10 @@ class _TelaHomeState extends State<TelaHome> {
                             icone: Icons.add,
                             texto: 'Nova atividade',
                             onTap: () async {
-                              final novaAtividade = await Navigator.push(
+                              await Navigator.push(
                                 context,
                                 MaterialPageRoute(builder: (context) => const NovaAtividadeScreen()),
                               );
-                              if (novaAtividade != null) {
-                                setState(() => AppData.atividades.add(novaAtividade));
-                              }
                             },
                           ),
                         ),
@@ -407,6 +445,8 @@ class _TelaHomeState extends State<TelaHome> {
           ),
         ),
       ),
+    );
+      },
     );
   }
 

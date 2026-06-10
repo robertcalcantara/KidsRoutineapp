@@ -37,11 +37,22 @@ class _TelaLoginState extends State<TelaLogin> {
     final data = await ChildService.getPerfil();
     if (data != null) {
       AppData.fromFirestore(data);
+
+      // Segurança: a Home e o Perfil devem mostrar o nome da criança.
+      // Nunca use displayName/email do responsável como nome da criança.
+      if (AppData.nomeCrianca.trim().isEmpty) {
+        AppData.nomeCrianca = 'Criança';
+        await ChildService.salvarPerfil({'nome': AppData.nomeCrianca});
+      }
     } else {
-      // Primeira vez: usa displayName do Auth e cria o documento
-      final nome = usuario?.displayName ?? '';
-      AppData.nomeCrianca = nome.isNotEmpty ? nome : 'Meu Filho(a)';
-      await ChildService.criarPerfilInicial(AppData.nomeCrianca);
+      // Caso raro: login sem documento de perfil.
+      // Não usamos displayName do Auth, pois ele pode ser o nome do responsável.
+      AppData.nomeCrianca = 'Criança';
+      await ChildService.criarPerfilInicial(
+        AppData.nomeCrianca,
+        responsavel1: usuario?.displayName ?? '',
+        emailResponsavel: usuario?.email ?? '',
+      );
     }
 
     if (!mounted) return;
