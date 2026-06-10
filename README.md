@@ -13,7 +13,8 @@ O projeto foi desenvolvido utilizando Flutter para o front-end, proporcionando u
 |---------------|--------------------------------------------------|
 | **Eliseu F. Martins** | Tela de Login, Tela de Cadastro, Tela de Recuperação de Senha, Tela Home, autenticação Firebase (E-mail/Senha), Login com Google (Google Sign-In), validação de domínio institucional @sounit.com.br, tratamento de erros de autenticação, integração com Firebase Authentication e configuração OAuth para ambiente Web. **Vídeo de defesa:** (https://drive.google.com/file/d/168gxOVL5emVhtuURNXraBh6Xnr7l651k/view?usp=sharing) |
 | Rafael Dantas | Tela de geração e criação de relatório médico, criação do Firestore (banco) para a ficha médica, integração do Firebase à tela da ficha médica, geração e salvamento de PDF. **Vídeo de defesa:** (https://drive.google.com/file/d/1cTe6q8HXtGIcDE2lnx1fGcWDQQYCflnP/view?usp=sharing) |
-| Luís Eduardo Cunha M. | Perfil da criança (visualizar, editar e excluir dados) |
+| Luís Eduardo Cunha M. |Tela de Perfil da criança, integração com Firebase Firestore (salvamento e carregamento dos dados da criança), Firebase Storage (foto de perfil) e sincronização dos dados entre telas. **Vídeo de defesa:**
+(https://drive.google.com/file/d/1FZMSxKWiMFwDop66Skw__NUeCjvNQlRa/view?usp=sharing) |
 | Pedro Roberto N. Melo | Cadastro de atividades, horários, categorias e repetição |
 | Robert Costa Alcântara | Histórico, configurações e compartilhamento |
 | Yan Levi Silva Cardoso | Geração de PDF da rotina e compartilhamento |                                                                              
