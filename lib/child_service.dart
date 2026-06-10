@@ -10,8 +10,11 @@ class ChildService {
 
   static String get _uid => _auth.currentUser!.uid;
 
+  static DocumentReference<Map<String, dynamic>> get _userDoc =>
+      _db.collection('users').doc(_uid);
+
   static DocumentReference<Map<String, dynamic>> get _perfilDoc =>
-      _db.collection('users').doc(_uid).collection('children').doc('perfil');
+      _userDoc.collection('children').doc('perfil');
 
   // ─── STREAM em tempo real ─────────────────────────────────────────────────
   static Stream<Map<String, dynamic>?> watchPerfil() {
@@ -30,6 +33,8 @@ class ChildService {
 
   // ─── SALVAR perfil ────────────────────────────────────────────────────────
   static Future<void> salvarPerfil(Map<String, dynamic> data) async {
+    await garantirDocumentoUsuario();
+
     await _perfilDoc.set(
       {...data, 'updatedAt': FieldValue.serverTimestamp()},
       SetOptions(merge: true),
@@ -54,12 +59,31 @@ class ChildService {
   }
 
   // ─── CRIAR perfil inicial após cadastro ───────────────────────────────────
+  static Future<void> garantirDocumentoUsuario() async {
+    final user = _auth.currentUser;
+
+    if (user == null) {
+      throw Exception('Usuário não autenticado');
+    }
+
+    await _userDoc.set({
+      'uid': user.uid,
+      'email': user.email ?? '',
+      'displayName': user.displayName ?? '',
+      'createdAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
+  // ─── CRIAR perfil inicial após cadastro ───────────────────────────────────
   static Future<void> criarPerfilInicial(
     String nomeCrianca, {
     String responsavel1 = '',
     String responsavel2 = '',
     String emailResponsavel = '',
   }) async {
+    await garantirDocumentoUsuario();
+
     final nomeLimpo = nomeCrianca.trim();
     final dados = {
       'nome': nomeLimpo.isNotEmpty ? nomeLimpo : 'Criança',

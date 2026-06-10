@@ -283,6 +283,13 @@ class _NovaAtividadeScreenState extends State<NovaAtividadeScreen> {
   if (fim == null) return;
 
   try {
+    final usuario = FirebaseAuth.instance.currentUser;
+
+    if (usuario == null) {
+      _mostrarMensagem('Usuário não autenticado. Faça login novamente.');
+      return;
+    }
+
     await FirebaseFirestore.instance.collection('atividades').add({
       'nome': _nomeController.text.trim(),
       'categoria': _categoriaSelecionada,
@@ -292,7 +299,12 @@ class _NovaAtividadeScreenState extends State<NovaAtividadeScreen> {
       'concluida': false,
       'concluidaEm': null,
       'criadoEm': FieldValue.serverTimestamp(),
-      'usuario_logado': FirebaseAuth.instance.currentUser?.email,
+
+      // Campos de segurança para separar as atividades por conta.
+      // O app consulta pelo uid, então uma conta não vê atividades da outra.
+      'uid': usuario.uid,
+      'usuario_logado': usuario.email ?? '',
+      'childId': 'perfil',
     });
 
     if (mounted) {

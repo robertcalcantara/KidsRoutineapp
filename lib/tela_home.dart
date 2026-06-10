@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'widgets/navbar.dart';
@@ -37,8 +38,18 @@ class _TelaHomeState extends State<TelaHome> {
   String get fotoUrl     => AppData.fotoUrl;
   Uint8List? get fotoPerfil => AppData.fotoPerfil;
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> get _atividadesStream =>
-      FirebaseFirestore.instance.collection('atividades').snapshots();
+  Stream<QuerySnapshot<Map<String, dynamic>>> get _atividadesStream {
+    final usuario = FirebaseAuth.instance.currentUser;
+
+    if (usuario == null) {
+      return const Stream.empty();
+    }
+
+    return FirebaseFirestore.instance
+        .collection('atividades')
+        .where('uid', isEqualTo: usuario.uid)
+        .snapshots();
+  }
 
   List<Atividade> _atividadesHoje(List<Atividade> atividades) {
     final hoje = DateTime.now();
@@ -71,6 +82,9 @@ class _TelaHomeState extends State<TelaHome> {
         .update({
       'concluida': value,
       'concluidaEm': value ? Timestamp.now() : null,
+      'atualizadoEm': FieldValue.serverTimestamp(),
+      'atualizadoPorUid': FirebaseAuth.instance.currentUser?.uid ?? '',
+      'atualizadoPorEmail': FirebaseAuth.instance.currentUser?.email ?? '',
     });
   }
 

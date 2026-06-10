@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'atividade.dart';
 import 'package:flutter/material.dart';
 
@@ -30,9 +31,20 @@ class _TelaRotinaState extends State<TelaRotina> {
 
   @override
   Widget build(BuildContext context) {
+    final usuario = FirebaseAuth.instance.currentUser;
+
+    if (usuario == null) {
+      return const Scaffold(
+        body: Center(
+          child: Text('Usuário não autenticado. Faça login novamente.'),
+        ),
+      );
+    }
+
     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
   stream: FirebaseFirestore.instance
       .collection('atividades')
+      .where('uid', isEqualTo: usuario.uid)
       .snapshots(),
   builder: (context, snapshot) {
     if (!snapshot.hasData) {
@@ -363,6 +375,9 @@ class _TelaRotinaState extends State<TelaRotina> {
                       .update({
                     'concluida': value,
                     'concluidaEm': value == true ? Timestamp.now() : null,
+                    'atualizadoEm': FieldValue.serverTimestamp(),
+                    'atualizadoPorUid': FirebaseAuth.instance.currentUser?.uid ?? '',
+                    'atualizadoPorEmail': FirebaseAuth.instance.currentUser?.email ?? '',
                   });
                 },
               ),
@@ -403,6 +418,12 @@ class _TelaRotinaState extends State<TelaRotina> {
     if (confirmar != true) return;
 
     try {
+      final usuario = FirebaseAuth.instance.currentUser;
+
+      if (usuario == null || atividade.uid != usuario.uid) {
+        throw Exception('Você não tem permissão para excluir esta atividade.');
+      }
+
       await FirebaseFirestore.instance
           .collection('atividades')
           .doc(atividade.id)

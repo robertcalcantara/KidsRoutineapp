@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'atividade.dart';
@@ -15,8 +16,18 @@ class _TelaHistoricoState extends State<TelaHistorico> {
   String filtroSelecionado = 'Hoje';
   DateTime mesSelecionado = DateTime.now();
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> get _atividadesStream =>
-      FirebaseFirestore.instance.collection('atividades').snapshots();
+  Stream<QuerySnapshot<Map<String, dynamic>>> get _atividadesStream {
+    final usuario = FirebaseAuth.instance.currentUser;
+
+    if (usuario == null) {
+      return const Stream.empty();
+    }
+
+    return FirebaseFirestore.instance
+        .collection('atividades')
+        .where('uid', isEqualTo: usuario.uid)
+        .snapshots();
+  }
 
   List<Atividade> _atividadesConcluidas(List<Atividade> atividades) {
     final lista = atividades
