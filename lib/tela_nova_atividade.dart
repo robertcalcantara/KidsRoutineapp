@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'atividade.dart';
@@ -259,38 +261,54 @@ class _NovaAtividadeScreenState extends State<NovaAtividadeScreen> {
     }
   }
 
-  void _salvarAtividade() {
-    if (_nomeController.text.trim().isEmpty) {
-      _mostrarMensagem('Digite o nome da atividade');
-      return;
-    }
-
-    final inicio = _montarHorario(
-      horaTexto: _inicioHoraController.text,
-      minutoTexto: _inicioMinController.text,
-      label: 'início',
-    );
-
-    if (inicio == null) return;
-
-    final fim = _montarHorario(
-      horaTexto: _fimHoraController.text,
-      minutoTexto: _fimMinController.text,
-      label: 'fim',
-    );
-
-    if (fim == null) return;
-
-    final novaAtividade = Atividade(
-      nome: _nomeController.text.trim(),
-      inicio: inicio,
-      fim: fim,
-      categoria: _categoriaSelecionada,
-      data: _dataSelecionada,
-    );
-
-    Navigator.pop(context, novaAtividade);
+  Future<void> _salvarAtividade() async {
+  if (_nomeController.text.trim().isEmpty) {
+    _mostrarMensagem('Digite o nome da atividade');
+    return;
   }
+
+  final inicio = _montarHorario(
+    horaTexto: _inicioHoraController.text,
+    minutoTexto: _inicioMinController.text,
+    label: 'início',
+  );
+
+  if (inicio == null) return;
+
+  final fim = _montarHorario(
+    horaTexto: _fimHoraController.text,
+    minutoTexto: _fimMinController.text,
+    label: 'fim',
+  );
+
+  if (fim == null) return;
+
+  try {
+    await FirebaseFirestore.instance.collection('atividades').add({
+      'nome': _nomeController.text.trim(),
+      'categoria': _categoriaSelecionada,
+      'inicio': inicio,
+      'fim': fim,
+      'data': Timestamp.fromDate(_dataSelecionada),
+      'concluida': false,
+      'concluidaEm': null,
+      'criadoEm': FieldValue.serverTimestamp(),
+      'usuario_logado': FirebaseAuth.instance.currentUser?.email,
+    });
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Atividade salva no Firebase'),
+        ),
+      );
+
+      Navigator.pop(context);
+    }
+  } catch (e) {
+    _mostrarMensagem('Erro ao salvar: $e');
+  }
+}
 
   String? _montarHorario({
     required String horaTexto,

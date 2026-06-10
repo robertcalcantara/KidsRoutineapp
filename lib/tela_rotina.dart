@@ -1,7 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'atividade.dart';
 import 'package:flutter/material.dart';
 
-import 'atividade.dart';
-import 'app_data.dart';
 import 'tela_nova_atividade.dart';
 import 'widgets/navbar.dart';
 
@@ -22,8 +22,6 @@ class _TelaRotinaState extends State<TelaRotina> {
   DateTime diaSelecionado = DateTime.now();
   DateTime mesSelecionado = DateTime.now();
 
-  List<Atividade> get atividades => AppData.atividades;
-
   @override
   void initState() {
     super.initState();
@@ -32,7 +30,27 @@ class _TelaRotinaState extends State<TelaRotina> {
 
   @override
   Widget build(BuildContext context) {
-    final atividadesFiltradas = atividades.where(_atividadeDentroDoFiltro).toList()
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+  stream: FirebaseFirestore.instance
+      .collection('atividades')
+      .snapshots(),
+  builder: (context, snapshot) {
+    if (!snapshot.hasData) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    final atividades = snapshot.data!.docs
+        .map((doc) => Atividade.fromFirestore(doc))
+        .toList();
+        print('ATIVIDADES ENCONTRADAS: ${atividades.length}');
+
+    final atividadesFiltradas = atividades
+        .where(_atividadeDentroDoFiltro)
+        .toList()
       ..sort((a, b) => a.inicio.compareTo(b.inicio));
 
     final atividadesPendentes = atividadesFiltradas
@@ -63,18 +81,12 @@ class _TelaRotinaState extends State<TelaRotina> {
         backgroundColor: const Color(0xFF1976D2),
         child: const Icon(Icons.add, color: Colors.white),
         onPressed: () async {
-          final novaAtividade = await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const NovaAtividadeScreen(),
-            ),
-          );
-
-          if (novaAtividade != null) {
-            setState(() {
-              AppData.atividades.add(novaAtividade);
-            });
-          }
+          await Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (context) => const NovaAtividadeScreen(),
+  ),
+);
         },
       ),
       body: SafeArea(
@@ -138,11 +150,11 @@ class _TelaRotinaState extends State<TelaRotina> {
         ),
       ),
     );
-  }
-
+  },
+);
+}
   Widget _buildFiltroButton(String texto) {
     final selecionado = filtroSelecionado == texto;
-
     return GestureDetector(
       onTap: () async {
         if (texto == 'Mês') {
@@ -339,15 +351,20 @@ class _TelaRotinaState extends State<TelaRotina> {
             ),
           ),
           Checkbox(
-            value: atividade.concluida,
-            activeColor: Colors.green,
-            onChanged: (value) {
-              setState(() {
-                atividade.concluida = value!;
-                atividade.concluidaEm = value ? DateTime.now() : null;
-              });
-            },
-          ),
+  value: atividade.concluida,
+  activeColor: Colors.green,
+  onChanged: (value) async {
+    await FirebaseFirestore.instance
+        .collection('atividades')
+        .doc(atividade.id)
+        .update({
+      'concluida': value,
+      'concluidaEm': value == true
+          ? Timestamp.now()
+          : null,
+    });
+  },
+),
         ],
       ),
     );
